@@ -60,10 +60,11 @@ ldd --version
 
 本项目基于 Python 3.10 开发，编译安装前请确保相关组件依赖满足以下要求：
 
-| 组件       | 版本       | 官网下载链接                                                 |
-| ---------- | ---------- | ------------------------------------------------------------ |
-| Python     | >= 3.10.15 | https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz |
-| PostgreSQL | >= 16.13   | https://ftp.postgresql.org/pub/source/v16.13/postgresql-16.13.tar.gz |
+| 组件       | 版本       | 说明       | 官网下载链接                                                     |
+| ---------- | ---------- |----------| ---------------------------------------------------------------- |
+| Python     | >= 3.10.15 | 项目开发语言   | https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz     |
+| PostgreSQL | >= 16.13   | 数据库存储服务  | https://ftp.postgresql.org/pub/source/v16.13/postgresql-16.13.tar.gz |
+| NodeJS     | >= 22.19.0 | 编排中心前端依赖 | https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz   |
 
 > 各组件离线安装指导如下，如果系统已有组件且版本已满足则可跳过此指导步骤
 
@@ -284,6 +285,46 @@ su - postgres -c "/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data restart"
 - 生产环境请务必修改默认密码
 - 配置防火墙规则限制数据库访问
 - 建议定期备份数据库
+
+### 2.2.3 NodeJS离线安装步骤
+
+#### 2.2.3.1 下载安装包
+
+在可接通网络的Linux服务器上执行以下命令获取安装包，Windows系统则直接访问网页下载获取
+
+```bash
+wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz
+```
+
+将 `node-v22.19.0-linux-x64.tar.xz` 传输到目标服务器。
+
+#### 2.2.3.2 解压安装包
+
+```bash
+tar -xJf node-v22.19.0-linux-x64.tar.xz -C /usr/local/
+mv /usr/local/node-v22.19.0-linux-x64 /usr/local/nodejs
+```
+
+#### 2.2.3.3 配置环境变量
+
+```bash
+# 添加NodeJS到系统环境变量
+echo "export PATH=/usr/local/nodejs/bin:\$PATH" >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### 2.2.3.4 验证安装
+
+```bash
+node --version   # 应输出 v22.19.0
+npm --version
+```
+
+#### 2.2.3.5 注意事项
+
+- NodeJS使用预编译二进制包，无需编译工具链
+- 默认安装路径为 `/usr/local/nodejs`
+- 生产环境建议使用nvm管理多个NodeJS版本
 
 ---
 
@@ -660,14 +701,14 @@ python start_agents_server.py
 左侧展示从注册中心获取的所有 Agent，可通过名称或功能进行搜索。
 
 4. 创建工作流
-单击 `+` 按钮，选择创建方式：
+单击 `+` 按钮，选择创建方式：([具体创建流程见编排中心用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md))
 
 | 方式 | 操作说明 |
 | --- | --- |
 | PDF 导入 | 上传 PDF 文件，系统自动解析并生成 PSOP |
 | 手动编排 | 将 Agent 卡片拖拽到画布，通过连线定义执行顺序 |
 | 自然语言生成 | 输入业务意图描述，后台自动编排生成 PSOP |
-- (具体创建流程见编排中心用户指南)
+
 5. 执行工作流
 - 输入用户意图，单击“检索工作流”按钮
 - 选择匹配的 PSOP
