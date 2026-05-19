@@ -17,12 +17,15 @@ todo
 说明：OpenAN首次开源A2A-T，todo
 
 # 2 软件安装指南（快速安装）
+流程图简要介绍安装流程：
+
+![photo](figures/installflow.png)
 
 ## 2.1 系统要求
 
 本项目基于 Python 3.10 开发，编译安装前请确保目标系统满足以下要求：
 
-### 2.1.1  操作系统
+### 操作系统
 
 | 操作系统 | 最低版本 |
 |---------|---------|
@@ -31,17 +34,11 @@ todo
 | Ubuntu | 18.04+ |
 | Debian | 10+ |
 
-### 2.1.2 编译工具链
 
-| 工具 | 最低版本 | 推荐版本 | 查看命令 |
-|-----|---------|---------|---------|
-| GCC | 4.8.5 | 5.0+ | `gcc --version` |
-| Make | 3.81 | 4.0+ | `make --version` |
-| Glibc | 2.17 | 2.28+ | `ldd --version` |
 
 > **说明**：Python 3.10 编译需要支持 C11 标准的编译器，GCC 5.0+ 可提供更好的优化支持。Glibc 2.17 是 Python 3.10 的最低要求，建议使用 2.28+ 以获得更好的兼容性。
 
-### 2.1.3 验证系统环境
+###  验证系统环境
 
 ```bash
 # 检查 GCC 版本
@@ -53,6 +50,41 @@ make --version
 # 检查 Glibc 版本
 ldd --version
 ```
+
+| 工具 | 最低版本 | 推荐版本 | 查看命令 |
+|-----|---------|---------|---------|
+| GCC | 4.8.5 | 5.0+ | `gcc --version` |
+| Make | 3.81 | 4.0+ | `make --version` |
+| Glibc | 2.17 | 2.28+ | `ldd --version` |
+> **说明**：Python 3.10 编译需要支持 C11 标准的编译器，GCC 5.0+ 可提供更好的优化支持。Glibc 2.17 是 Python 3.10 的最低要求，建议使用 2.28+ 以获得更好的兼容性。
+
+### 最小化部署硬件配置
+| 节点类型   | 节点数量 | vCPU(个) | 内存(GB)          | 硬盘        |
+|--------|------|---------|-----------------|-----------|
+| 引导节点   | 1    | 2       | 4               | 系统盘>=100G |
+| 业务集群节点 | 1    | 8       | 16              | 系统盘>=100G |
+
+> **说明**：引导节点和业务集群节点可以是同一个节点
+
+
+### 推荐硬件配置
+| 节点类型   | 节点数量     | vCPU(个)  | 内存(GB)   | 硬盘        |
+|--------|----------|----------|----------|-----------|
+| 引导节点   | 1        | 2        | 4        | 系统盘>=100G |
+| 业务集群节点 | 根据实际情况而定 | 根据实际情况而定 | 根据实际情况而定 | 根据实际情况而定  |
+
+> **说明**：当未启用并发多线程(SMT)或超线程时，一个vCPU相当于一个物理内核。启用后，使用以下公式换算：vCPU=(每个内核的线程数×内核数)×插槽数
+
+
+### 节点要求
+
+节点可以连通外部网络。<br>
+节点可以使用root用户登录。<br>
+引导节点上需要安装tar工具。
+> **须知**：建议您的节点环境足够干净，未安装任何Kubernetes组件，否则可能会发生版本冲突导致安装失败。
+
+
+
 
 ---
 
@@ -70,7 +102,7 @@ ldd --version
 
 ### 2.2.1 Python离线安装步骤
 
-#### 2.2.1.1 下载安装包
+1.下载安装包
 
 在可接通网络的Linux服务器上执行以下命令获取安装包，Windows系统则直接访问网页下载获取
 
@@ -80,28 +112,28 @@ wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
 
 将 `Python-3.10.15.tgz` 传输到目标服务器。
 
-#### 2.2.1.2 解压安装包
+2.解压安装包
 
 ```bash
 tar -xzf Python-3.10.15.tgz
 cd Python-3.10.15
 ```
 
-#### 2.2.1.3 配置安装路径
+3.配置安装路径
 
 ```bash
 # 安装到 /usr/local/python310，避免覆盖系统Python
 ./configure --prefix=/usr/local/python310 --enable-optimizations
 ```
 
-#### 2.2.1.4 编译安装
+4.编译安装
 
 ```bash
 make -j 4
 sudo make altinstall
 ```
 
-#### 2.2.1.5 创建软链接
+5.创建软链接
 
 ```bash
 # 创建python3软链接
@@ -111,14 +143,14 @@ sudo ln -sf /usr/local/python310/bin/python3 /usr/local/bin/python3
 sudo ln -sf /usr/local/python310/bin/pip3 /usr/local/bin/pip3
 ```
 
-#### 2.2.1.6 验证安装
+6.验证安装
 
 ```bash
 python3 --version   # 应输出 Python 3.10.15
 pip3 --version
 ```
 
-#### 2.2.1.7 注意事项
+7.注意事项
 
 - 安装路径 `/usr/local/python310` 不影响系统自带Python
 - 软链接放在 `/usr/local/bin`，优先级低于 `/usr/bin`
@@ -126,7 +158,7 @@ pip3 --version
 
 ### 2.2.2 PostgreSQL离线安装步骤
 
-#### 2.2.2.1 下载安装包
+1.下载安装包
 
 在可接通网络的Linux服务器上执行以下命令获取安装包，Windows系统则直接访问网页下载获取
 
@@ -136,14 +168,14 @@ wget https://ftp.postgresql.org/pub/source/v15.6/postgresql-15.6.tar.gz
 
 将 `postgresql-15.6.tar.gz` 传输到目标服务器。
 
-#### 2.2.2.2 解压安装包
+2.解压安装包
 
 ```bash
 tar -xzf postgresql-15.6.tar.gz
 cd postgresql-15.6
 ```
 
-#### 2.2.2.3 配置安装路径
+3.配置安装路径
 
 ```bash
 # 安装到 /usr/local/pgsql
@@ -156,34 +188,34 @@ cd postgresql-15.6
 - `--with-readline`: 启用readline支持（默认启用）
 - `--with-zlib`: 启用zlib支持（默认启用）
 
-#### 2.2.2.4 编译安装
+4.编译安装
 
 ```bash
 make -j 4
 sudo make install
 ```
 
-#### 2.2.2.5 创建postgres用户
+5.创建postgres用户
 
 ```bash
 sudo useradd postgres
 ```
 
-#### 2.2.2.6 创建数据目录并授权
+6.创建数据目录并授权
 
 ```bash
 sudo mkdir -p /usr/local/pgsql/data
 sudo chown -R postgres:postgres /usr/local/pgsql/data
 ```
 
-#### 2.2.2.7 初始化数据库
+7.初始化数据库
 
 ```bash
 su - postgres # 切换至postgres用户
 /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
 ```
 
-#### 2.2.2.8 启动PostgreSQL服务
+8.启动PostgreSQL服务
 
 ```bash
 # 切换至postgres用户
@@ -209,7 +241,7 @@ psql -l
 
 退出`postgres`用户可输入`exit`
 
-#### 2.2.2.9 配置systemd服务（可选）
+9.配置systemd服务（可选）
 
 ```bash
 sudo tee /etc/systemd/system/postgresql.service << EOF
@@ -237,7 +269,7 @@ sudo systemctl enable postgresql
 sudo systemctl start postgresql
 ```
 
-#### 2.2.2.10 创建数据库和用户
+10.创建数据库和用户
 
 ```bash
 # 切换至postgres用户
@@ -253,7 +285,7 @@ psql
 CREATE USER registry_user WITH ENCRYPTED PASSWORD 'your_password' CREATEDB;
 ```
 
-#### 2.2.2.11 配置远程访问（使用root用户）
+11.配置远程访问（使用root用户）
 
 编辑 `/usr/local/pgsql/data/pg_hba.conf`，在末尾添加：
 
@@ -279,7 +311,7 @@ sudo systemctl restart postgresql
 su - postgres -c "/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data restart"
 ```
 
-#### 2.2.2.12 注意事项
+12.注意事项
 
 - PostgreSQL 默认使用端口 5432
 - 生产环境请务必修改默认密码
@@ -288,7 +320,7 @@ su - postgres -c "/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data restart"
 
 ### 2.2.3 NodeJS离线安装步骤
 
-#### 2.2.3.1 下载安装包
+1.下载安装包
 
 在可接通网络的Linux服务器上执行以下命令获取安装包，Windows系统则直接访问网页下载获取
 
@@ -298,14 +330,14 @@ wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz
 
 将 `node-v22.19.0-linux-x64.tar.xz` 传输到目标服务器。
 
-#### 2.2.3.2 解压安装包
+2.解压安装包
 
 ```bash
 tar -xJf node-v22.19.0-linux-x64.tar.xz -C /usr/local/
 mv /usr/local/node-v22.19.0-linux-x64 /usr/local/nodejs
 ```
 
-#### 2.2.3.3 配置环境变量
+3.配置环境变量
 
 ```bash
 # 添加NodeJS到系统环境变量
@@ -313,14 +345,14 @@ echo "export PATH=/usr/local/nodejs/bin:\$PATH" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### 2.2.3.4 验证安装
+4.验证安装
 
 ```bash
 node --version   # 应输出 v22.19.0
 npm --version
 ```
 
-#### 2.2.3.5 注意事项
+5.注意事项
 
 - NodeJS使用预编译二进制包，无需编译工具链
 - 默认安装路径为 `/usr/local/nodejs`
@@ -330,7 +362,7 @@ npm --version
 
 ## 2.3 注册中心服务离线安装步骤
 
-### 2.3.1 准备安装包
+1.准备安装包
 
 下载注册中心源码：[registry-center-main-a2a1.0-20260430-release.zip](https://pan.quark.cn/s/4506a90cd7fc)
 
@@ -345,7 +377,7 @@ unzip registry-center-main-a2a1.0-20260430-release.zip
 unzip wheels.zip -d ./registry-center-main-a2a1.0-20260430-release
 ```
 
-### 2.3.2 创建虚拟环境
+2.创建虚拟环境
 
 ```bash
 cd registry-center-main-a2a1.0-20260430-release
@@ -354,7 +386,7 @@ cd registry-center-main-a2a1.0-20260430-release
 python3 -m venv venv --copies
 ```
 
-### 2.3.3 激活虚拟环境
+3.激活虚拟环境
 
 ```bash
 # 激活虚拟环境
@@ -363,14 +395,14 @@ source venv/bin/activate
 
 激活后，命令行前缀会显示 `(venv)`。
 
-### 2.3.4 离线安装依赖
+4.离线安装依赖
 
 ```bash
 # 从wheels文件夹离线安装所有依赖
 pip install --no-index --find-links=wheels/ -r ./requirements.txt
 ```
 
-### 2.3.5 服务安装配置（可选）
+5.服务安装配置（可选）
 
 可在`./etc/systemd/deploy.conf`文件中配置服务部署目录等，离线安装模式下可不修改此配置文件
 
@@ -396,7 +428,7 @@ INSTALL_DEPS=false
 > 退出vi：按下Esc按键，输入:wq!
 
 
-### 2.3.6 修改数据库连接配置
+6.修改数据库连接配置
 
 修改注册中心配置文件： `./etc/conf/persistence.conf`
 
@@ -406,14 +438,14 @@ INSTALL_DEPS=false
 
 - 用户名`postgresql.username`、密码`postgresql.password`按照数据库实际设置的情况进行修改
 
-### 2.3.7 给脚本添加可执行权限
+7.给脚本添加可执行权限
 
 ```bash
 # 给脚本添加可执行权限
 chmod +x ./bin/*.sh
 ```
 
-### 2.3.8 安装服务到指定目录
+8.安装服务到指定目录
 
 ```bash
 # 安装服务到步骤3.5中指定的INSTALL_DIR目录
@@ -432,7 +464,7 @@ sudo ./bin/install_service.sh install
 # Service installed successfully!
 ```
 
-### 2.3.9 初始化服务配置
+9.初始化服务配置
 
 ```bash
 # 进入服务安装目录
@@ -458,7 +490,7 @@ cd /OpenA2A-T/registry-center
 配置已完成，已保存在 /OpenA2A-T/registry-center/etc/conf/server.conf
 ```
 
-### 2.3.10 启动服务和状态管理
+10.启动服务和状态管理
 
 ```bash
 # 启动服务
@@ -471,7 +503,7 @@ systemctl status registry-center
 systemctl stop registry-center
 ```
 
-### 2.3.11 服务状态日志查看
+11.服务状态日志查看
 
 ```bash
 # 查看所有日志
@@ -481,7 +513,7 @@ journalctl -u registry-center
 journalctl -u registry-center
 ```
 
-### 2.3.12 卸载服务
+12.卸载服务
 
 ```bash
 # 从安装目录卸载服务
@@ -492,7 +524,7 @@ sudo ./bin/install_service.sh uninstall
 
 ## 2.4 编排中心服务离线安装步骤
 
-### 2.4.1 准备安装包
+1.准备安装包
 
 下载注册中心源码：[orchestration-center-main-a2a1.0-20260430-release.zip](https://pan.quark.cn/s/346356c6a6aa)
 
@@ -507,7 +539,7 @@ unzip orchestration-center-main-a2a1.0-20260430-release.zip
 unzip wheels.zip -d ./orchestration-center-main-a2a1.0-20260430-release
 ```
 
-### 2.4.2 创建虚拟环境
+2.创建虚拟环境
 
 ```bash
 cd orchestration-center-main-a2a1.0-20260430-release
@@ -516,7 +548,7 @@ cd orchestration-center-main-a2a1.0-20260430-release
 python3 -m venv venv --copies
 ```
 
-### 2.4.3 激活虚拟环境
+3.激活虚拟环境
 
 ```bash
 # 激活虚拟环境
@@ -525,14 +557,14 @@ source venv/bin/activate
 
 激活后，命令行前缀会显示 `(venv)`。
 
-### 2.4.4 离线安装依赖
+4.离线安装依赖
 
 ```bash
 # 从wheels文件夹离线安装所有依赖
 pip install --no-index --find-links=wheels/ -r ./requirements.txt
 ```
 
-### 2.4.5 服务安装配置（可选）
+5.服务安装配置（可选）
 
 可在`./etc/systemd/deploy.conf`文件中配置服务部署目录等，离线安装模式下可不修改此配置文件
 
@@ -557,7 +589,7 @@ INSTALL_DEPS=false
 
 > 退出vi：按下Esc按键，输入:wq!
 
-### 2.4.6 修改数据库连接配置
+6.修改数据库连接配置
 
 修改编排中心配置文件： `./etc/conf/db_config.conf`
 
@@ -567,14 +599,14 @@ INSTALL_DEPS=false
 
 - 用户名`user`密码、`password`按照数据库实际设置的情况进行修改
 
-### 2.4.7 给脚本添加可执行权限
+7.给脚本添加可执行权限
 
 ```bash
 # 给脚本添加可执行权限
 chmod +x ./bin/*.sh
 ```
 
-### 2.4.8 安装服务到指定目录
+8.安装服务到指定目录
 
 ```bash
 # 安装服务到步骤4.5中指定的INSTALL_DIR目录
@@ -593,7 +625,7 @@ sudo ./bin/install_service.sh install
 # Service installed successfully!
 ```
 
-### 2.4.9 初始化服务配置（需配置数据库）
+9.初始化服务配置（需配置数据库）
 
 ```bash
 # 进入服务安装目录
@@ -610,7 +642,7 @@ vi ./etc/conf/server.conf
 :wq!
 ```
 
-### 2.4.10 启动服务和状态管理
+10.启动服务和状态管理
 
 ```bash
 # 启动服务
@@ -623,7 +655,7 @@ systemctl status orchestration-center
 systemctl stop orchestration-center
 ```
 
-### 2.4.11 服务状态日志查看
+11.服务状态日志查看
 
 ```bash
 # 查看所有日志
@@ -633,7 +665,7 @@ journalctl -u orchestration-center
 journalctl -u orchestration-center
 ```
 
-### 2.4.12 卸载服务
+12.卸载服务
 
 ```bash
 # 从安装目录卸载服务
