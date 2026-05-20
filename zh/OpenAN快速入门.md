@@ -289,21 +289,21 @@ CREATE USER registry_user WITH ENCRYPTED PASSWORD 'your_password' CREATEDB;
 
 11.配置远程访问（使用root用户）
 
-编辑 `/usr/local/pgsql/data/pg_hba.conf`，在末尾添加：
+- 编辑 `/usr/local/pgsql/data/pg_hba.conf`，在末尾添加：
 
 ```bash
 # 添加允许远程连接
 host    all             all             0.0.0.0/0               scram-sha-256
 ```
 
-编辑 `/usr/local/pgsql/data/postgresql.conf`：
+- 编辑 `/usr/local/pgsql/data/postgresql.conf`：
 
 ```bash
 # 修改监听地址
 listen_addresses = '*'
 ```
 
-重启服务：
+- 重启服务：
 
 ```bash
 # 使用systemctl重启（推荐）
@@ -313,7 +313,7 @@ sudo systemctl restart postgresql
 su - postgres -c "/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data restart"
 ```
 
-12.注意事项
+**注意事项**
 
 - PostgreSQL 默认使用端口 5432
 - 生产环境请务必修改默认密码
@@ -354,7 +354,7 @@ node --version   # 应输出 v22.19.0
 npm --version
 ```
 
-5.注意事项
+**注意事项**
 
 - NodeJS使用预编译二进制包，无需编译工具链
 - 默认安装路径为 `/usr/local/nodejs`
