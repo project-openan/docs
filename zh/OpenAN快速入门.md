@@ -727,6 +727,9 @@ npm run dev
 ---
 
 # 3 快速入门
+
+## 3.1 注册中心和编排中心
+
 ![photo](figures/a2a-t.png)
 
 注册中心是一个专注于Agent统一管理的服务，支持用户将来自不同厂商的Agent进行集中注册与管理，实现多源Agent的可控接入与维护。主要功能包括：
@@ -750,14 +753,17 @@ npm run dev
 - **意图检索 PSOP**：根据自然语言描述，检索匹配的历史工作流。
 - **实时流程执行**：支持以流式方式启动 PSOP 执行，并实时推送运行进展，便于监控与调试。
 
-## 3.1 启动服务
-### 3.1.1 启动注册中心服务
+### 3.1.1 启动服务
+#### 3.1.1.1 启动注册中心服务
 [启动方式见注册中心的用户指南](https://gitcode.com/OpenAN/registry-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)
-### 3.1.2 启动编排中心后端服务
+
+#### 3.1.1.2 启动编排中心后端服务
 [启动方式见编排中心的用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)
-### 3.1.3 启动编排中心前端界面
+
+#### 3.1.1.3 启动编排中心前端界面
 [启动方式见编排中心的用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)
-## 3.2 启动示例 Agent
+
+### 3.1.2 启动示例 Agent
 为了快速体验完整流程，可以启动项目自带的示例 Agent 服务
 ```bash
 cd {项目路径}/orchestration-center/samples
@@ -766,7 +772,7 @@ python start_agents_server.py
 该脚本会：
 - 向注册中心注册多个示例 Agent
 - 启动对应的 Agent 服务，供编排中心调用
-## 3.3 核心流程验证
+### 3.1.3 核心流程验证
 完成上述步骤后，您可以按照以下流程体验 OpenAN 的核心能力：
 
 ![photo](figures/workflow.png)
@@ -797,15 +803,15 @@ python start_agents_server.py
 - 选择匹配的 PSOP
 - 单击 `▶` 按钮执行，右侧区域实时显示执行过程
 
-## 3.4 示例Agent介绍
+### 3.1.4 示例Agent介绍
 
 本章节以赛事直播保障场景为例，介绍多个Agent如何协同工作，实现端到端的闭环自治。
 
-### 场景背景
+#### 场景背景
 
 在赛事直播场景中，需要保证直播过程的网络稳定，确保观众获得流畅的观看体验。该场景涉及Live Streaming Agent、Assurance Agent和RAN Agent三个智能体的协作。
 
-### Agent角色说明
+#### Agent角色说明
 
 | Agent名称 | 职责 |
 | --- | --- |
@@ -813,7 +819,7 @@ python start_agents_server.py
 | Assurance Agent | 负责保障策略及其恢复策略的生成 |
 | RAN Agent | 负责无线网络的分析、规划与策略执行 |
 
-### 协作流程
+#### 协作流程
 
 整个赛事直播保障流程分为保障执行和保障恢复两个阶段：
 
