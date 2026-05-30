@@ -773,15 +773,54 @@ Java SDK 源码和示例均位于 `a2a-t-java` 仓库。运行前需准备 JDK 1
 
 ### 3.1.1 启动服务
 #### 3.1.1.1 启动注册中心服务
-[启动方式见注册中心的用户指南](https://gitcode.com/OpenAN/registry-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)
+[启动方式见注册中心的用户指南](https://gitcode.com/OpenAN/registry-center/blob/main/docs/zh/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md#%E5%90%AF%E5%8A%A8cli)
 
 #### 3.1.1.2 启动编排中心后端服务
-[启动方式见编排中心的用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)
+[启动方式见编排中心的用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md#222-%E5%90%AF%E5%8A%A8%E7%BC%96%E6%8E%92%E4%B8%AD%E5%BF%83%E5%90%8E%E7%AB%AF%E6%9C%8D%E5%8A%A1)
 
 #### 3.1.1.3 启动编排中心前端界面
-[启动方式见编排中心的用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)
+[启动方式见编排中心的用户指南](https://gitcode.com/OpenAN/orchestration-center/blob/main/docs/zh/%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md#223-%E5%AE%89%E8%A3%85%E5%89%8D%E7%AB%AF%E4%BE%9D%E8%B5%96%E5%B9%B6%E5%90%AF%E5%8A%A8)
 
-### 3.1.2 启动示例 Agent
+### 3.1.2 示例Agent介绍
+ 	 
+本章节以赛事直播保障场景为例，介绍多个Agent如何协同工作，实现端到端的闭环自治。
+ 	 
+#### 场景背景
+ 	 
+在赛事直播场景中，需要保证直播过程的网络稳定，确保观众获得流畅的观看体验。该场景涉及Live Streaming Agent、Assurance Agent和RAN Agent三个智能体的协作。
+ 	 
+#### Agent角色说明
+ 	 
+| Agent名称 | 职责 |
+| --- | --- |
+| Live Streaming Agent | 负责赛事需求的解析与监控 |
+| Assurance Agent | 负责保障策略及其恢复策略的生成 |
+| RAN Agent | 负责无线网络的分析、规划与策略执行 |
+ 	 
+#### 协作流程
+整个赛事直播保障流程分为保障执行和保障恢复两个阶段：
+**阶段一：保障执行流程**
+```mermaid
+ 	 flowchart LR
+ 	     A[Live Streaming Agent<br/>提取赛事路线和业务需求] --> B[Live Streaming Agent<br/>下发需求给Assurance Agent]
+ 	     B --> C[Assurance Agent<br/>将赛事保障需求转换为网络需求]
+ 	     C --> D[Assurance Agent<br/>下发网络需求给RAN Agent]
+ 	     D --> E[RAN Agent<br/>分析网络现状]
+ 	     E --> F[RAN Agent<br/>规划网络策略方案]
+ 	     F --> G[RAN Agent<br/>执行网络策略方案]
+ 	     G --> H[Live Streaming Agent<br/>实时反馈KQI指标及任务状态]
+ ```
+**阶段二：保障恢复流程**
+```mermaid
+ 	 flowchart LR
+ 	     H[Live Streaming Agent<br/>实时反馈KQI指标及任务状态] --> I[Assurance Agent<br/>下发恢复网络配置指令]
+ 	     I --> J[RAN Agent<br/>执行网络配置恢复]
+ ```
+ 	 
+以下视频展示了赛事直播保障场景中多Agent协作的完整流程，涵盖保障执行与保障恢复两个阶段：
+ 	 
+<video src="figures/vedio.mp4" controls width="600"></video>
+### 3.1.3 启动示例 Agent
 为了快速体验完整流程，可以启动项目自带的示例 Agent 服务
 ```bash
 cd {项目路径}/orchestration-center/samples
@@ -790,7 +829,7 @@ python start_agents_server.py
 该脚本会：
 - 向注册中心注册多个示例 Agent
 - 启动对应的 Agent 服务，供编排中心调用
-### 3.1.3 核心流程验证
+### 3.1.4 核心流程验证
 完成上述步骤后，您可以按照以下流程体验 OpenAN 的核心能力：
 
 ![photo](figures/workflow.png)
@@ -820,60 +859,6 @@ python start_agents_server.py
 - 输入用户意图，单击“检索工作流”按钮
 - 选择匹配的 PSOP
 - 单击 `▶` 按钮执行，右侧区域实时显示执行过程
-
-### 3.1.4 示例Agent介绍
-
-本章节以赛事直播保障场景为例，介绍多个Agent如何协同工作，实现端到端的闭环自治。
-
-#### 场景背景
-
-在赛事直播场景中，需要保证直播过程的网络稳定，确保观众获得流畅的观看体验。该场景涉及Live Streaming Agent、Assurance Agent和RAN Agent三个智能体的协作。
-
-#### Agent角色说明
-
-| Agent名称 | 职责 |
-| --- | --- |
-| Live Streaming Agent | 负责赛事需求的解析与监控 |
-| Assurance Agent | 负责保障策略及其恢复策略的生成 |
-| RAN Agent | 负责无线网络的分析、规划与策略执行 |
-
-#### 协作流程
-
-整个赛事直播保障流程分为保障执行和保障恢复两个阶段：
-
-```mermaid
-flowchart TD
-    subgraph 阶段一:保障执行
-        A[Live Streaming Agent<br/>提取赛事路线和业务需求] --> B[Live Streaming Agent<br/>下发需求给Assurance Agent]
-        B --> C[Assurance Agent<br/>将赛事保障需求转换为网络需求]
-        C --> D[Assurance Agent<br/>下发网络需求给RAN Agent]
-        D --> E[RAN Agent<br/>分析网络现状]
-        E --> F[RAN Agent<br/>规划网络策略方案]
-        F --> G[RAN Agent<br/>执行网络策略方案]
-        G --> H[Live Streaming Agent<br/>实时反馈KQI指标及任务状态]
-    end
-
-    subgraph 阶段二:保障恢复
-        H --> I[Assurance Agent<br/>下发恢复网络配置指令]
-        I --> J[RAN Agent<br/>执行网络配置恢复]
-    end
-```
-
-**阶段一：保障执行**
-
-1. **需求提取**：Live Streaming Agent提取赛事路线和业务需求
-2. **需求下发**：Live Streaming Agent将需求下发给Assurance Agent
-3. **需求转换**：Assurance Agent将赛事保障需求转换成网络需求
-4. **网络需求下发**：Assurance Agent将网络需求下发给RAN Agent
-5. **网络分析**：RAN Agent分析当前网络现状
-6. **策略规划**：RAN Agent根据网络现状和网络保障需求，规划网络策略方案
-7. **策略执行**：RAN Agent执行网络策略方案
-8. **状态反馈**：Live Streaming Agent实时反馈保障任务关键质量指标及任务状态，直到直播结束
-
-**阶段二：保障恢复**
-
-9. **恢复指令下发**：Assurance Agent下发恢复保障前网络配置指令
-10. **配置恢复**：RAN Agent执行网络配置恢复操作
 
 ## 3.2 A2A-T SDK
 
