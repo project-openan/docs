@@ -819,7 +819,7 @@ Java SDK 源码和示例均位于 `a2a-t-java` 仓库。运行前需准备 JDK 1
  	 
 以下视频展示了赛事直播保障场景中多Agent协作的完整流程，涵盖保障执行与保障恢复两个阶段：
 
-![协作流程演示视频](figures/vedio.gif)
+![协作流程演示视频](/zh/figures/vedio.gif)
 ### 3.1.3 启动示例 Agent
 为了快速体验完整流程，可以启动项目自带的示例 Agent 服务
 ```bash
