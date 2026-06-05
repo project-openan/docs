@@ -21,7 +21,7 @@
 
 ### Project Introduction
 
-OpenAN is an autonomous network open source project collection that supports the development and deployment of communication agents through a series of open source projects, enabling multi-vendor, cross-layer, and cross-domain integration, accelerating autonomous networks toward L4-L5. [See "OpenAN Quick Start" Project Introduction chapter](./OpenAN快速入门.md#1-project-introduction).
+OpenAN is an autonomous network open source project collection that supports the development and deployment of communication agents through a series of open source projects, enabling multi-vendor, cross-layer, and cross-domain integration, accelerating autonomous networks toward L4-L5. [See "OpenAN Quick Start" Project Introduction chapter](./quick_start.md#1-project-introduction).
 
 This whitepaper is intended for open source community users, architects, and design roles, explaining OpenAN's security technology architecture, security mechanisms, and security best practices.
 
