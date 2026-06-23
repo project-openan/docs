@@ -51,7 +51,7 @@ OpenAN contains 6 modules, forming a complete intelligent agent collaboration fr
 
 > **Note**: OpenAN's first open-source release includes A2A-T SDK, Registration and Orchestration, and Scenario-based Practices modules. Other modules will continue to evolve in subsequent versions.
 
-![photo](figures/architectural%20diagram.png)
+![photo](figures/architectural%20diagram.PNG)
 
 # 2 Software Installation Guide
 

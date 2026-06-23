@@ -36,15 +36,15 @@ OpenAN version numbering uses year and month as the version number, allowing use
 
 # Version Introduction
 
-This version is the first release of OpenAN, with modules including registry-center, orchestration-center, A2A-T SDK (A2A-T Python SDK, A2A-T Java SDK).
+This version is the first release of OpenAN, with modules including registry-center, orchestration-center, A2A-T SDK (a2a-t-sdk-python, a2a-t-sdk-java).
 
 - The main features of registry-center are shown in [Table 1](#table_registry_features). For detailed information on feature descriptions, please refer to [Registry-center User Guide](https://github.com/project-openan/registry-center/blob/main/docs/en/Registry%20Center%20User%20Guide.md).
   
 - The main features of orchestration-center are shown in [Table 2](#table_orchestrate_features). For detailed information on feature descriptions, please refer to [Orchestration-center User Guide](https://github.com/project-openan/orchestration-center/blob/main/docs/en/Orchestration%20Center%20User%20Guide.md).
   
-- The main features of A2A-T Python SDK are shown in [Table 3](#table_a2at_sdk_features). For detailed information on feature descriptions, please refer to [A2A-T Python SDK User Guide](https://github.com/project-openan/a2a-t-sdk/blob/main/docs/en/user_guide.md).
+- The main features of a2a-t-sdk-python are shown in [Table 3](#table_a2at_sdk_features). For detailed information on feature descriptions, please refer to [a2a-t-sdk-python User Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/user_guide.md).
   
-- The main features of A2A-T Java SDK are shown in [Table 4](#table_a2at_java_features). For detailed information on feature descriptions, please refer to [A2A-T Java SDK User Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/user_guide.md).
+- The main features of a2a-t-sdk-java are shown in [Table 4](#table_a2at_java_features). For detailed information on feature descriptions, please refer to [a2a-t-sdk-java User Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/user_guide.md).
 
 **Table 1** Registry-center Feature List<a id="table_registry_features" href="#"></a>
 <table border="0">
@@ -241,7 +241,7 @@ This version is the first release of OpenAN, with modules including registry-cen
   </tbody>
 </table>
 
-**Table 3** A2A-T Python SDK Feature List<a id="table_a2at_sdk_features" href="#"></a>
+**Table 3** a2a-t-sdk-python Feature List<a id="table_a2at_sdk_features" href="#"></a>
 <table border="0">
   <thead>
     <tr>
@@ -361,7 +361,7 @@ This version is the first release of OpenAN, with modules including registry-cen
   </tbody>
 </table>
 
-**Table 4** A2A-T Java SDK Feature List<a id="table_a2at_java_features" href="#"></a>
+**Table 4** a2a-t-sdk-java Feature List<a id="table_a2at_java_features" href="#"></a>
 <table border="0">
   <thead>
     <tr>
@@ -684,13 +684,13 @@ The initial release of orchestration-center only provides source code, without b
 > - See requirements.txt for the complete dependency list.
 > - The negotiation configuration of a2a-t-sdk is automatically generated from `common/config/llm_config.json` to `samples/a2at_config/.env`.
 
-## A2A-T Python SDK
+## a2a-t-sdk-python
 
 ### Deliverables
 
-The initial release of A2A-T Python SDK only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community A2A-T Python SDK repository](https://github.com/project-openan/a2a-t-sdk).
+The initial release of a2a-t-sdk-python only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community a2a-t-sdk-python repository](https://github.com/project-openan/a2a-t-sdk-python).
 
-**Table 1** A2A-T Python SDK v0.1.9 Deliverable List
+**Table 1** a2a-t-sdk-python v0.1.9 Deliverable List
 
 <table border="0">
   <thead>
@@ -703,7 +703,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
   <tbody>
     <tr>
       <td>Source Code</td>
-      <td>A2A-T Python SDK source code</td>
+      <td>a2a-t-sdk-python source code</td>
       <td>Complete source code of A2A-T SDK, including client task prompt generation, server compliance validation, multi-round negotiation, LLM runtime, and prompt resource management modules</td>
     </tr>
   </tbody>
@@ -718,7 +718,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Operating System Version Compatibility
 
-**Table 2** A2A-T Python SDK v0.1.9 Supported Scenarios
+**Table 2** a2a-t-sdk-python v0.1.9 Supported Scenarios
 
 | Operating System | Version | Architecture | Applicability |
 |---------|------|------|----------|
@@ -729,13 +729,13 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 > **Note:**
 >
-> - A2A-T Python SDK is a pure Python package with no platform-native dependencies, theoretically supporting all platforms where Python 3.12+ can run.
+> - a2a-t-sdk-python is a pure Python package with no platform-native dependencies, theoretically supporting all platforms where Python 3.12+ can run.
 > - Windows and macOS environments are only for development and debugging; production deployment is not supported.
 > - This SDK itself does not provide HTTP services; the transport layer and deployment environment must be provided by the integrator's business system.
 
 ### Runtime Environment Version Compatibility
 
-**Table 3** A2A-T Python SDK v0.1.9 Runtime Environment Requirements
+**Table 3** a2a-t-sdk-python v0.1.9 Runtime Environment Requirements
 
 | Software | Version Requirement | Purpose |
 |-----|---------|------|
@@ -752,7 +752,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Core Dependency Version Compatibility
 
-**Table 4** A2A-T Python SDK v0.1.9 Core Python Dependencies
+**Table 4** a2a-t-sdk-python v0.1.9 Core Python Dependencies
 
 | Dependency | Version | Purpose |
 |-----|------|------|
@@ -770,7 +770,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Configuration Item Compatibility
 
-**Table 5** A2A-T Python SDK v0.1.9 Configuration Item Description
+**Table 5** a2a-t-sdk-python v0.1.9 Configuration Item Description
 
 | Configuration Category | Configuration Item | Default Value | Description |
 |---------|-------|-------|------|
@@ -802,7 +802,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Protocol Standard Compatibility
 
-**Table 6** Protocol Standards Followed by A2A-T Python SDK v0.1.9
+**Table 6** Protocol Standards Followed by a2a-t-sdk-python v0.1.9
 
 | Standard | Version | Description |
 |-----|------|------|
@@ -811,17 +811,17 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 > **Note:**
 >
-> - A2A-T Python SDK is the reference implementation SDK for the A2A-T protocol standard. Task prompt format and negotiation process follow the above protocol standards.
+> - a2a-t-sdk-python is the reference implementation SDK for the A2A-T protocol standard. Task prompt format and negotiation process follow the above protocol standards.
 > - The A2A-T protocol is the telecom domain extension of the A2A (Agent-to-Agent) protocol, standardized and published by TM Forum.
 
 
-## A2A-T Java SDK
+## a2a-t-sdk-java
 
 ### Deliverables
 
-The initial release of A2A-T Java SDK only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community A2A-T Java SDK repository](https://github.com/project-openan/a2a-t-sdk-java).
+The initial release of a2a-t-sdk-java only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community a2a-t-sdk-java repository](https://github.com/project-openan/a2a-t-sdk-java).
 
-**Table 1** A2A-T Java SDK v0.1.9 Deliverable List
+**Table 1** a2a-t-sdk-java v0.1.9 Deliverable List
 
 <table border="0">
   <thead>
@@ -835,7 +835,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
     <tr>
       <td>Source Code</td>
       <td>a2a-t-java source code</td>
-      <td>Complete source code of A2A-T Java SDK, including 9 Maven modules: core model, resource management, LLM runtime, prompt processing, negotiation runtime, client facade, server facade, and sample integration</td>
+      <td>Complete source code of a2a-t-sdk-java, including 9 Maven modules: core model, resource management, LLM runtime, prompt processing, negotiation runtime, client facade, server facade, and sample integration</td>
     </tr>
     <tr>
       <td>Maven Artifact</td>
@@ -863,7 +863,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Operating System Version Compatibility
 
-**Table 2** A2A-T Java SDK v0.1.9 Supported Scenarios
+**Table 2** a2a-t-sdk-java v0.1.9 Supported Scenarios
 
 | Operating System | Version | Architecture | Applicability |
 |---------|------|------|----------|
@@ -874,13 +874,13 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 > **Note:**
 >
-> - A2A-T Java SDK is a pure Java SDK with no platform-native dependencies, theoretically supporting all platforms where JDK 17+ can run.
+> - a2a-t-sdk-java is a pure Java SDK with no platform-native dependencies, theoretically supporting all platforms where JDK 17+ can run.
 > - Windows and macOS environments are only for development and debugging; production deployment is not supported.
 > - This SDK itself does not provide HTTP services; the transport layer and deployment environment must be provided by the integrator's business system.
 
 ### Runtime Environment Version Compatibility
 
-**Table 3** A2A-T Java SDK v0.1.9 Runtime Environment Requirements
+**Table 3** a2a-t-sdk-java v0.1.9 Runtime Environment Requirements
 
 | Software | Version Requirement | Purpose |
 |-----|---------|------|
@@ -898,7 +898,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Core Dependency Version Compatibility
 
-**Table 4** A2A-T Java SDK v0.1.9 Core Dependencies
+**Table 4** a2a-t-sdk-java v0.1.9 Core Dependencies
 
 | Dependency | Version | Purpose |
 |-----|------|------|
@@ -919,7 +919,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Module Version Compatibility
 
-**Table 5** A2A-T Java SDK v0.1.9 Module List
+**Table 5** a2a-t-sdk-java v0.1.9 Module List
 
 | Module | ArtifactId | Purpose | Dependent Modules |
 |------|-----------|------|----------|
@@ -954,7 +954,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Configuration Item Compatibility
 
-**Table 6** A2A-T Java SDK v0.1.9 Configuration Item Description
+**Table 6** a2a-t-sdk-java v0.1.9 Configuration Item Description
 
 | Configuration Category | Configuration Item | Default Value | Description |
 |---------|-------|-------|------|
@@ -991,7 +991,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Protocol Standard Compatibility
 
-**Table 7** Protocol Standards Followed by A2A-T Java SDK v0.1.9
+**Table 7** Protocol Standards Followed by a2a-t-sdk-java v0.1.9
 
 | Standard | Version | Description |
 |-----|------|------|
@@ -1000,7 +1000,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 > **Note:**
 >
-> - A2A-T Java SDK is the Java reference implementation SDK for the A2A-T protocol standard. Task prompt format and negotiation process follow the above protocol standards.
+> - a2a-t-sdk-java is the Java reference implementation SDK for the A2A-T protocol standard. Task prompt format and negotiation process follow the above protocol standards.
 > - The A2A-T protocol is the telecom domain extension of the A2A (Agent-to-Agent) protocol, standardized and published by TM Forum.
 > - Negotiation context transmission follows the A2A project telecom extension URI convention, carried in Task.metadata through the `https://projects.tmforum.org/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1` key.
 
