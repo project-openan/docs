@@ -669,7 +669,7 @@ The initial release of orchestration-center only provides source code, without b
 
 | Dependency | Version | Purpose |
 |-----|------|------|
-| a2a-t-sdk | >= 0.1.8 | Agent negotiation capability (fulfillment negotiation) |
+| a2a-t-sdk | >= 1.0.0 | Agent negotiation capability (fulfillment negotiation) |
 | a2a-sdk | latest | A2A protocol implementation (http-server + grpc) |
 | fastapi | >= 0.135.1 | REST API framework |
 | uvicorn | >= 0.42 | ASGI server |
@@ -690,7 +690,7 @@ The initial release of orchestration-center only provides source code, without b
 
 The initial release of a2a-t-sdk-python only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community a2a-t-sdk-python repository](https://github.com/project-openan/a2a-t-sdk-python).
 
-**Table 1** a2a-t-sdk-python v0.1.9 Deliverable List
+**Table 1** a2a-t-sdk-python v1.0.0 Deliverable List
 
 <table border="0">
   <thead>
@@ -714,11 +714,11 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 >
 > - The initial release only delivers source code; deliverables do not include build engineering or binary installation packages.
 > - Users need to complete build and installation themselves via `uv sync --dev` or `pip install -e .`.
-> - This version is in the Alpha stage (v0.1.9); interfaces and resource organization may be adjusted with subsequent version evolution.
+> - This version is in the Alpha stage (v1.0.0); interfaces and resource organization may be adjusted with subsequent version evolution.
 
 ### Operating System Version Compatibility
 
-**Table 2** a2a-t-sdk-python v0.1.9 Supported Scenarios
+**Table 2** a2a-t-sdk-python v1.0.0 Supported Scenarios
 
 | Operating System | Version | Architecture | Applicability |
 |---------|------|------|----------|
@@ -735,7 +735,7 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 
 ### Runtime Environment Version Compatibility
 
-**Table 3** a2a-t-sdk-python v0.1.9 Runtime Environment Requirements
+**Table 3** a2a-t-sdk-python v1.0.0 Runtime Environment Requirements
 
 | Software | Version Requirement | Purpose |
 |-----|---------|------|
@@ -752,7 +752,7 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 
 ### Core Dependency Version Compatibility
 
-**Table 4** a2a-t-sdk-python v0.1.9 Core Python Dependencies
+**Table 4** a2a-t-sdk-python v1.0.0 Core Python Dependencies
 
 | Dependency | Version | Purpose |
 |-----|------|------|
@@ -770,7 +770,7 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 
 ### Configuration Item Compatibility
 
-**Table 5** a2a-t-sdk-python v0.1.9 Configuration Item Description
+**Table 5** a2a-t-sdk-python v1.0.0 Configuration Item Description
 
 | Configuration Category | Configuration Item | Default Value | Description |
 |---------|-------|-------|------|
@@ -802,7 +802,7 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 
 ### Protocol Standard Compatibility
 
-**Table 6** Protocol Standards Followed by a2a-t-sdk-python v0.1.9
+**Table 6** Protocol Standards Followed by a2a-t-sdk-python v1.0.0
 
 | Standard | Version | Description |
 |-----|------|------|
@@ -821,7 +821,7 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 
 The initial release of a2a-t-sdk-java only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community a2a-t-sdk-java repository](https://github.com/project-openan/a2a-t-sdk-java).
 
-**Table 1** a2a-t-sdk-java v0.1.9 Deliverable List
+**Table 1** a2a-t-sdk-java v1.0.0 Deliverable List
 
 <table border="0">
   <thead>
@@ -859,11 +859,11 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 >
 > - The initial release only delivers source code. Integrators need to build artifacts through Maven.
 > - Users can import the SDK through Maven dependencies, or build it themselves via `mvn -DskipTests package`.
-> - This version is in the Alpha stage (v0.1.9); interfaces and module organization may be adjusted with subsequent version evolution.
+> - This version is in the Alpha stage (v1.0.0); interfaces and module organization may be adjusted with subsequent version evolution.
 
 ### Operating System Version Compatibility
 
-**Table 2** a2a-t-sdk-java v0.1.9 Supported Scenarios
+**Table 2** a2a-t-sdk-java v1.0.0 Supported Scenarios
 
 | Operating System | Version | Architecture | Applicability |
 |---------|------|------|----------|
@@ -880,7 +880,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 
 ### Runtime Environment Version Compatibility
 
-**Table 3** a2a-t-sdk-java v0.1.9 Runtime Environment Requirements
+**Table 3** a2a-t-sdk-java v1.0.0 Runtime Environment Requirements
 
 | Software | Version Requirement | Purpose |
 |-----|---------|------|
@@ -898,7 +898,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 
 ### Core Dependency Version Compatibility
 
-**Table 4** a2a-t-sdk-java v0.1.9 Core Dependencies
+**Table 4** a2a-t-sdk-java v1.0.0 Core Dependencies
 
 | Dependency | Version | Purpose |
 |-----|------|------|
@@ -919,7 +919,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 
 ### Module Version Compatibility
 
-**Table 5** a2a-t-sdk-java v0.1.9 Module List
+**Table 5** a2a-t-sdk-java v1.0.0 Module List
 
 | Module | ArtifactId | Purpose | Dependent Modules |
 |------|-----------|------|----------|
@@ -954,7 +954,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 
 ### Configuration Item Compatibility
 
-**Table 6** a2a-t-sdk-java v0.1.9 Configuration Item Description
+**Table 6** a2a-t-sdk-java v1.0.0 Configuration Item Description
 
 | Configuration Category | Configuration Item | Default Value | Description |
 |---------|-------|-------|------|
@@ -991,7 +991,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 
 ### Protocol Standard Compatibility
 
-**Table 7** Protocol Standards Followed by a2a-t-sdk-java v0.1.9
+**Table 7** Protocol Standards Followed by a2a-t-sdk-java v1.0.0
 
 | Standard | Version | Description |
 |-----|------|------|
