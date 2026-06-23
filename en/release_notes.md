@@ -1,3 +1,21 @@
+﻿<!--
+Copyright (c) 2026 Huawei Technologies Co., Ltd.
+All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may
+   not use this file except in compliance with the License. You may obtain
+   a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations
+   under the License.
+-->
 # Release Notes
 
 This document is the release notes for OpenAN-v26.06.
@@ -109,7 +127,7 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>SQLite Storage</td>
-      <td>Supports using SQLite embedded database for data persistence, enabled through the configuration item persistence_mode=sqlite, suitable for lightweight deployment scenarios.</td>
+      <td>Supports using SQLite embedded database for data persistence (in development), enabled through the configuration item persistence_mode=sqlite, suitable for lightweight deployment scenarios.</td>
     </tr>
     <tr>
       <td rowspan="7">Security Capabilities</td>
@@ -251,7 +269,11 @@ This version is the first release of OpenAN, with modules including registry-cen
       <td>Task prompts adopt YAML front-matter format, including metadata such as scenario_code, language, description, etc., facilitating server-side parsing and validation.</td>
     </tr>
     <tr>
-      <td rowspan="4">Task Prompt Compliance Validation</td>
+      <td rowspan="5">Task Prompt Compliance Validation</td>
+      <td>Guardrail Check</td>
+      <td>After receiving a task prompt, the server first performs security guardrail checks, identifying and intercepting prompts containing malicious intents to ensure interaction security. Currently provides noop (pass-through) implementation, with AWS Bedrock and Azure Content Safety extension interfaces reserved.</td>
+    </tr>
+    <tr>
       <td>Scenario Parsing</td>
       <td>Automatically parses the front-matter metadata of the task prompt, identifies scenario_code, and loads the corresponding slot Schema and scenario template.</td>
     </tr>
@@ -265,12 +287,24 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>Compliance Pipeline</td>
-      <td>The server provides a complete compliance validation pipeline (scenario parsing → slot extraction → Schema validation → semantic validation), with each stage configurable for on-demand enabling/disabling.</td>
+      <td>The server provides a complete compliance validation pipeline (guardrail → scenario parsing → slot extraction → Schema validation → semantic validation), with each stage configurable for on-demand enabling/disabling.</td>
     </tr>
     <tr>
-      <td rowspan="1">Multi-round Negotiation</td>
+      <td rowspan="4">Multi-round Negotiation</td>
       <td>Information Negotiation</td>
       <td>Supports information supplement negotiation between Agents. When task prompt information is incomplete, the server can initiate an information negotiation request to obtain missing information.</td>
+    </tr>
+    <tr>
+      <td>Clarification Negotiation</td>
+      <td>Supports requirement clarification negotiation between Agents. When task intent is ambiguous or unclear, specific requirements are clarified through multi-round interactions.</td>
+    </tr>
+    <tr>
+      <td>Feasibility Negotiation</td>
+      <td>Supports feasibility confirmation negotiation between Agents, evaluating feasibility before task execution to avoid ineffective execution of infeasible tasks.</td>
+    </tr>
+    <tr>
+      <td>Fulfillment Negotiation</td>
+      <td>Supports task execution detail negotiation between Agents, negotiating task execution plans, timing, resources, and other details. After reaching agreement, enters the execution phase.</td>
     </tr>
     <tr>
       <td rowspan="3">Negotiation State Management</td>
@@ -286,7 +320,15 @@ This version is the first release of OpenAN, with modules including registry-cen
       <td>Provides NegotiationStateStore protocol interface. Currently has built-in in-memory storage implementation, supporting negotiation state access by session ID.</td>
     </tr>
     <tr>
-      <td rowspan="2">LLM Runtime</td>
+      <td rowspan="4">LLM Runtime</td>
+      <td>Multi-mode Invocation</td>
+      <td>Supports three LLM invocation modes: single completion (complete), conversation with session history (chat), and structured output (structured), meeting different scenario requirements.</td>
+    </tr>
+    <tr>
+      <td>Adapter Factory</td>
+      <td>Provides LLMAdapterFactory factory class, supporting direct adapter registration and composite registration (transport + payload_builder + response_parser). Currently pre-registers deepseek (OpenAI-compatible protocol) adapter.</td>
+    </tr>
+    <tr>
       <td>Session Management</td>
       <td>Built-in session history management, supporting configuration of history window size (A2AT_LLM_HISTORY_WINDOW), maximum total sessions, and per-Provider session limit to prevent memory overflow.</td>
     </tr>
@@ -330,7 +372,7 @@ This version is the first release of OpenAN, with modules including registry-cen
   </thead>
   <tbody>
     <tr>
-      <td rowspan="4">Task Prompt Generation</td>
+      <td rowspan="5">Task Prompt Generation</td>
       <td>Scenario Identification</td>
       <td>Performs scenario identification on user input based on LLM, automatically matching predefined telecom operation scenarios (such as alarm subscription, fault diagnosis, energy-saving optimization, dedicated line complaints, etc.), supporting Chinese and English bilingual scenario definitions.</td>
     </tr>
@@ -347,7 +389,15 @@ This version is the first release of OpenAN, with modules including registry-cen
       <td>Task prompts adopt YAML front-matter format, including metadata such as scenario_code, language, description, etc., facilitating server-side parsing and validation.</td>
     </tr>
     <tr>
-      <td rowspan="4">Task Prompt Compliance Validation</td>
+      <td>Orchestrator Pattern</td>
+      <td>Client prompt generation is driven by the <code>ClientPromptGenerationOrchestrator</code> orchestrator, providing default implementation <code>DefaultClientPromptGenerationOrchestrator</code>, supporting custom replacement of each stage component through the Builder pattern.</td>
+    </tr>
+    <tr>
+      <td rowspan="6">Task Prompt Compliance Validation</td>
+      <td>Guardrail Check</td>
+      <td>After receiving a task prompt, the server first performs security guardrail checks, identifying and intercepting prompts containing malicious intents to ensure interaction security. Provides <code>ServerPromptGuardrail</code> extension interface and <code>NoopServerPromptGuardrail</code> default pass-through implementation, with AWS Bedrock and Azure Content Safety external policy endpoint configurations reserved.</td>
+    </tr>
+    <tr>
       <td>Scenario Parsing</td>
       <td>Automatically parses the front-matter metadata of the task prompt, identifies scenario_code, and loads the corresponding slot Schema and scenario template. Supports two strategies: LLM parsing (<code>LlmBackedPromptMetadataExtractor</code>) and template matching parsing (<code>TemplateMatchingPromptMetadataExtractor</code>).</td>
     </tr>
@@ -361,12 +411,28 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>Compliance Pipeline</td>
-      <td>The server provides a complete compliance validation pipeline (scenario parsing → slot extraction → Schema validation → semantic validation), driven by the <code>ServerPromptComplianceOrchestrator</code> orchestrator, with each stage configurable for on-demand enabling/disabling.</td>
+      <td>The server provides a complete compliance validation pipeline (guardrail → scenario parsing → slot extraction → Schema validation → semantic validation), driven by the <code>ServerPromptComplianceOrchestrator</code> orchestrator, with each stage configurable for on-demand enabling/disabling.</td>
     </tr>
     <tr>
-      <td rowspan="1">Multi-round Negotiation</td>
+      <td>Compliance Result Model</td>
+      <td>Provides <code>PromptComplianceResult</code> and <code>PromptComplianceFailure</code> structured result models, clearly recording validation failure stages and error codes, facilitating issue localization.</td>
+    </tr>
+    <tr>
+      <td rowspan="4">Multi-round Negotiation</td>
       <td>Information Negotiation</td>
       <td>Supports information supplement negotiation between Agents. When task prompt information is incomplete, the server can initiate an information negotiation request to obtain missing information.</td>
+    </tr>
+    <tr>
+      <td>Clarification Negotiation</td>
+      <td>Supports requirement clarification negotiation between Agents. When task intent is ambiguous or unclear, specific requirements are clarified through multi-round interactions.</td>
+    </tr>
+    <tr>
+      <td>Feasibility Negotiation</td>
+      <td>Supports feasibility confirmation negotiation between Agents, evaluating feasibility before task execution to avoid ineffective execution of infeasible tasks.</td>
+    </tr>
+    <tr>
+      <td>Fulfillment Negotiation</td>
+      <td>Supports task execution detail negotiation between Agents, negotiating task execution plans, timing, resources, and other details. After reaching agreement, enters the execution phase.</td>
     </tr>
     <tr>
       <td rowspan="4">Negotiation State Management</td>
@@ -375,7 +441,7 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>Context Transmission</td>
-      <td>Negotiation context follows A2A-T protocol extension URI convention, carried in Task.metadata through the <code>https://github.com/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1</code> key, supporting serialization and deserialization, ensuring multi-round negotiation state continuity.</td>
+      <td>Negotiation context follows A2A-T protocol extension URI convention, carried in Task.metadata through the <code>https://projects.tmforum.org/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1</code> key, supporting serialization and deserialization, ensuring multi-round negotiation state continuity.</td>
     </tr>
     <tr>
       <td>State Storage</td>
@@ -386,13 +452,21 @@ This version is the first release of OpenAN, with modules including registry-cen
       <td>Provides <code>NegotiationHandler</code> core handler, supporting Builder pattern registration of negotiation type handlers (<code>NegotiationTypeHandler</code>) and state storage. Client and server share negotiation orchestration logic through <code>RoleBoundNegotiationOrchestrator</code>.</td>
     </tr>
     <tr>
-      <td rowspan="2">LLM Runtime</td>
-      <td>Session Management</td>
-      <td>Built-in session history management, supporting configuration of history window size (A2AT_LLM_HISTORY_WINDOW), maximum total sessions, and per-Provider session limit to prevent memory overflow.</td>
+      <td rowspan="4">LLM Runtime</td>
+      <td>Adapter Architecture</td>
+      <td>Provides <code>LLMAdapter</code> interface and <code>OpenAICompatibleAdapter</code> implementation, based on OpenAI Java SDK (v4.36.0) compatible with all OpenAI protocol model services, switching different LLM backends through configuration.</td>
     </tr>
     <tr>
-      <td>Extensible</td>
-      <td>LLM adapters support dynamic registration. All model services compatible with OpenAI protocol can be connected through configuration without modifying SDK source code.</td>
+      <td>Structured Generation</td>
+      <td>Supports structured output constrained by JSON Schema (<code>StructuredGenerationRequest</code>), used for LLM invocation scenarios requiring structured responses such as scenario identification and slot extraction.</td>
+    </tr>
+    <tr>
+      <td>Session Management</td>
+      <td>Built-in <code>LlmSessionStore</code> and <code>InMemoryLlmSessionStore</code>, supporting configuration of history window size, maximum total sessions, and per-Provider session limit to prevent memory overflow. Provides token usage tracking (<code>LlmUsage</code>).</td>
+    </tr>
+    <tr>
+      <td>Local Rule Engine</td>
+      <td>In addition to the OpenAI-compatible adapter, provides <code>local_rule</code> provider type, supporting rule-based local scenario identification and slot extraction, suitable for deterministic scenarios without LLM requirements.</td>
     </tr>
     <tr>
       <td rowspan="3">Prompt Resource Management</td>
@@ -405,7 +479,7 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>Standardized Organization</td>
-      <td>Prompt resources are organized using a standardized directory structure: scenarios/{lang}/scenarios.json (scenario definitions), slots/{scenario}/{lang}/slot.json (slot Schemas), templates/{scenario}/{lang}/template.md (templates).</td>
+      <td>Prompt resources are organized using a standardized directory structure: scenarios/{lang}/scenarios.json (scenario definitions), slots/{scenario}/{lang}/slot.json (slot Schemas), templates/{scenario}/{lang}/template.md (templates), prompts/{action}/{lang}/ (system/user prompts).</td>
     </tr>
     <tr>
       <td rowspan="3">Configuration Management</td>
@@ -495,7 +569,7 @@ The initial release of registry-center only provides source code, without binary
 >
 > - The registry-center service is started via `python -m agent_registry.start`, defaulting to listening on `127.0.0.1:5000`.
 > - IP and port can be modified as needed. The configuration file is {installation directory}/etc/conf/server.conf.
-> - Defaults to file storage mode (persistence_mode=file), with data saved in {installation directory}/data/agentcard.json. Supports switching to postgresql or sqlite storage mode. The configuration file is {installation directory}/etc/conf/persistence.conf.
+> - Defaults to file storage mode (persistence_mode=file), with data saved in {installation directory}/data/agentcard.json. Supports switching to postgresql or sqlite (in development) storage mode. The configuration file is {installation directory}/etc/conf/persistence.conf.
 > - Milvus is an optional dependency for the semantic search feature; if semantic search is not used, Milvus does not need to be deployed.
 
 ### Core Dependency Version Compatibility
@@ -593,18 +667,17 @@ The initial release of orchestration-center only provides source code, without b
 
 **Table 4** Orchestration-center v1.0.0 Core Python Dependencies
 
-| Dependency | Version    | Purpose |
-|-----------|------------|------|
-| a2a-t-sdk | >= 1.0.0   | Agent negotiation capability (fulfillment negotiation) |
-| a2a-sdk   | latest     | A2A protocol implementation (http-server + grpc) |
-| fastapi   | >= 0.135.1 | REST API framework |
-| uvicorn   | >= 0.42    | ASGI server |
-| pydantic  | >= 2.12.5  | Data model validation |
-| openai    | >= 2.26.0  | LLM invocation |
-| loguru    | >= 0.7.3   | Logging |
-| PyYAML    | >= 6.0.3   | YAML parsing |
-| pymupdf   | latest     | PDF document parsing |
-| sse_starlette | >= 3.3.4   | SSE event stream support |
+| Dependency | Version | Purpose |
+|-----|------|------|
+| a2a-t-sdk | >= 1.0.0 | Agent negotiation capability (fulfillment negotiation) |
+| a2a-sdk | latest | A2A protocol implementation (http-server + grpc) |
+| fastapi | >= 0.135.1 | REST API framework |
+| uvicorn | >= 0.42 | ASGI server |
+| pydantic | >= 2.12.5 | Data model validation |
+| openai | >= 2.26.0 | LLM invocation |
+| loguru | >= 0.7.3 | Logging |
+| PyYAML | >= 6.0.3 | YAML parsing |
+| pymupdf | latest | PDF document parsing |
 
 > **Note:**
 >
@@ -641,6 +714,7 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 >
 > - The initial release only delivers source code; deliverables do not include build engineering or binary installation packages.
 > - Users need to complete build and installation themselves via `uv sync --dev` or `pip install -e .`.
+> - This version is in the Alpha stage (v1.0.0); interfaces and resource organization may be adjusted with subsequent version evolution.
 
 ### Operating System Version Compatibility
 
@@ -663,10 +737,10 @@ The initial release of a2a-t-sdk-python only provides source code, without binar
 
 **Table 3** a2a-t-sdk-python v1.0.0 Runtime Environment Requirements
 
-| Software | Version Requirement       | Purpose |
-|-----|---------------------------|------|
-| Python | >= 3.12                   | SDK runtime environment |
-| uv (recommended) / pip | uv >= 0.4 / pip >= 23     | Package management and build tools |
+| Software | Version Requirement | Purpose |
+|-----|---------|------|
+| Python | >= 3.12 | SDK runtime environment |
+| uv (recommended) / pip | uv >= 0.4 / pip >= 23 | Package management and build tools |
 | LLM service | OpenAI protocol compatible | Dependency for LLM invocation scenarios such as task prompt generation, slot extraction, semantic validation |
 
 > **Note:**
@@ -785,6 +859,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 >
 > - The initial release only delivers source code. Integrators need to build artifacts through Maven.
 > - Users can import the SDK through Maven dependencies, or build it themselves via `mvn -DskipTests package`.
+> - This version is in the Alpha stage (v1.0.0); interfaces and module organization may be adjusted with subsequent version evolution.
 
 ### Operating System Version Compatibility
 
@@ -807,10 +882,10 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 
 **Table 3** a2a-t-sdk-java v1.0.0 Runtime Environment Requirements
 
-| Software | Version Requirement      | Purpose |
-|-----|--------------------------|------|
-| JDK | >= 17                    | SDK runtime environment |
-| Maven | >= 3.8                   | Build and dependency management tool |
+| Software | Version Requirement | Purpose |
+|-----|---------|------|
+| JDK | >= 17 | SDK runtime environment |
+| Maven | >= 3.8 | Build and dependency management tool |
 | LLM service | OpenAI protocol compatible | Dependency for LLM invocation scenarios such as scenario identification, slot extraction, semantic validation |
 
 > **Note:**
@@ -927,7 +1002,7 @@ The initial release of a2a-t-sdk-java only provides source code, without binary 
 >
 > - a2a-t-sdk-java is the Java reference implementation SDK for the A2A-T protocol standard. Task prompt format and negotiation process follow the above protocol standards.
 > - The A2A-T protocol is the telecom domain extension of the A2A (Agent-to-Agent) protocol, standardized and published by TM Forum.
-> - Negotiation context transmission follows the A2A project telecom extension URI convention, carried in Task.metadata through the `https://github.com/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1` key.
+> - Negotiation context transmission follows the A2A project telecom extension URI convention, carried in Task.metadata through the `https://projects.tmforum.org/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1` key.
 
 
 # CVE Vulnerabilities

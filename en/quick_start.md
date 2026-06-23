@@ -1,3 +1,21 @@
+﻿<!--
+Copyright (c) 2026 Huawei Technologies Co., Ltd.
+All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may
+   not use this file except in compliance with the License. You may obtain
+   a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations
+   under the License.
+-->
 # 1 Project Introduction
 
 ## Background
@@ -649,7 +667,7 @@ cd /OpenA2A-T/orchestration-center
 vi ./etc/conf/server.conf
 ```
 
-The service supports HTTPS capability by default. **For first-time startup, you can choose to disable it, and configure it later as needed by following this section**
+HTTPS capability is under development and disabled by default. To enable it, set `enable_https` to `true`, ensure SSL certificates are configured, then restart the service.
 
 ```bash
 # Set enable_https=false
@@ -706,9 +724,9 @@ After successful startup, you can access the orchestration-center frontend inter
 
 ## 2.6 A2A-T SDK Offline Installation Steps
 
-A2A-T SDK includes A2A-T Python SDK and a2a-t-sdk-java, which are the Python/Java implementations of the A2A-T protocol. A2A-T Python SDK provides task prompt generation, prompt validation, and multi-round negotiation capabilities for client Agents and server Agents. a2a-t-sdk-java provides client prompt generation, server prompt validation, negotiation runtime, and A2A Java integration examples for Java Agents.
+A2A-T SDK includes a2a-t-sdk-python and a2a-t-sdk-java, which are the Python/Java implementations of the A2A-T protocol. a2a-t-sdk-python provides task prompt generation, prompt validation, and multi-round negotiation capabilities for client Agents and server Agents. a2a-t-sdk-java provides client prompt generation, server prompt validation, negotiation runtime, and A2A Java integration examples for Java Agents.
 
-- A2A-T Python SDK
+- a2a-t-sdk-python
 
 [Installation and configuration instructions are in the Python SDK User Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/user_guide.md)
 
@@ -799,13 +817,13 @@ In the live event broadcasting scenario, network stability during the broadcast 
   	 
 The following video demonstrates the complete multi-Agent collaboration flow in the live event broadcasting assurance scenario, covering both the assurance execution and assurance recovery phases:
 
-![Collaboration Flow Demo Video](./figures/vedio.gif)
+![Collaboration Flow Demo Video](./figures/video.gif)
 
 ### 3.1.3 Start Example Agents
 To quickly experience the complete flow, you can start the example Agent services included in the project.
 ```bash
 cd {project path}/orchestration-center/samples
-python3 start_agents_server.py
+python -m samples.start_agents_server
 ```
 This script will:
 - Register multiple example Agents with the registry-center.
@@ -844,9 +862,9 @@ Click the `+` button and select the creation method: ([For detailed creation flo
 
 ## 3.2 A2A-T SDK
 
-### 3.2.1 A2A-T Python SDK
+### 3.2.1 a2a-t-sdk-python
 
-A2A-T Python SDK is the Python implementation of the A2A-T protocol, providing task prompt generation, prompt validation, and multi-round negotiation capabilities for client Agents and server Agents. Key features include:
+a2a-t-sdk-python is the Python implementation of the A2A-T protocol, providing task prompt generation, prompt validation, and multi-round negotiation capabilities for client Agents and server Agents. Key features include:
 
 - **Task Prompt Generation**: The client generates A2A-T processed task prompt based on user natural language or structured input.
 - **Task Prompt Validation**: The server validates the scenario, template, slot, and semantic consistency of the processed task prompt.

@@ -1,3 +1,21 @@
+﻿<!--
+Copyright (c) 2026 Huawei Technologies Co., Ltd.
+All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may
+   not use this file except in compliance with the License. You may obtain
+   a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations
+   under the License.
+-->
 # OpenAN Security Technology Whitepaper
 
 ## Table of Contents
@@ -227,7 +245,7 @@ Inbound traffic:
 | Service | Port | Protocol | Access Source |
 |------|------|------|---------|
 | registry-center service | As configured (default HTTPS) | HTTPS | Operations client, orchestration-center |
-| orchestration-center backend | As configured (default HTTPS) | HTTPS | Operations client |
+| orchestration-center backend | As configured (default HTTP, HTTPS under development) | HTTPS | Operations client |
 | orchestration-center frontend | 3003 | HTTP | Operations client (intranet) |
 | PostgreSQL | 5432 | TCP | OpenAN service nodes |
 | SSH management | 22 | SSH | System administrator domain |

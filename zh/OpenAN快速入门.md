@@ -1,3 +1,21 @@
+﻿<!--
+Copyright (c) 2026 Huawei Technologies Co., Ltd.
+All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may
+   not use this file except in compliance with the License. You may obtain
+   a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations
+   under the License.
+-->
 # 1 项目介绍
 
 ## 背景
@@ -30,9 +48,9 @@ OpenAN 包含 6 个模块，构成了完整的智能体协作框架：
 
 6、通信技能与组件库：负责各种场景下的技能、组件、知识等，运营商、厂商分享贡献。
 
-> **说明**：openAN首次开源发布 A2A-T SDK、注册与编排、场景化实践模块，其他模块后续版本持续演进。
+> **说明**：OpenAN首次开源发布 A2A-T SDK、注册与编排、场景化实践模块，其他模块后续版本持续演进。
 
-![photo](<figures/architectural diagram.png>)
+![photo](figures/architectural%20diagram.png)
 
 
 # 2 软件安装指南
@@ -499,7 +517,7 @@ cd /OpenA2A-T/registry-center
 ./venv/bin/python3 -m agent_registry.init
 ```
 
-服务默认支持HTTPS和AgentCard签名及验签能力，**首次启动可选择关闭，后续按需执行此章节进行配置**。
+服务支持HTTPS和AgentCard签名及验签能力，**首次启动可选择关闭，后续按需执行此章节进行配置**。
 
 ```bash
 是否开启HTTPS enable_https (y/n, 默认: true): n
@@ -651,7 +669,7 @@ cd /OpenA2A-T/orchestration-center
 vi ./etc/conf/server.conf
 ```
 
-服务默认支持HTTPS能力，**首次启动可选择关闭，后续按需执行此章节进行配置**
+HTTPS 能力开发中，默认关闭。如需启用，请将 `enable_https` 改为 `true`，并确保已配置 SSL 证书后重启服务。
 
 ```bash
 # 设置enable_https=false
@@ -801,13 +819,13 @@ Java SDK 源码和示例均位于 `a2a-t-sdk-java` 仓库。运行前需准备 J
  	 
 以下视频展示了赛事直播保障场景中多Agent协作的完整流程，涵盖保障执行与保障恢复两个阶段：
 
-![协作流程演示视频](./figures/vedio.gif)
+![协作流程演示视频](./figures/video.gif)
 
 ### 3.1.3 启动示例 Agent
 为了快速体验完整流程，可以启动项目自带的示例 Agent 服务。
 ```bash
 cd {项目路径}/orchestration-center/samples
-python3 start_agents_server.py
+python -m samples.start_agents_server
 ```
 该脚本会：
 - 向注册中心注册多个示例 Agent。
@@ -839,7 +857,7 @@ python3 start_agents_server.py
 | 手动编排 | 将 Agent 卡片拖拽到画布，通过连线定义执行顺序 |
 | 自然语言生成 | 输入业务意图描述，后台自动编排生成 PSOP |
 
-1. 执行工作流
+5. 执行工作流
 - 输入用户意图，单击“检索工作流”按钮
 - 选择匹配的 PSOP
 - 单击 `▶` 按钮执行，右侧区域实时显示执行过程
