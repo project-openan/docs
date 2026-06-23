@@ -1,4 +1,22 @@
-﻿# 1 项目介绍
+﻿<!--
+Copyright (c) 2026 Huawei Technologies Co., Ltd.
+All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you may
+   not use this file except in compliance with the License. You may obtain
+   a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and limitations
+   under the License.
+-->
+# 1 项目介绍
 
 ## 背景
 从 2G 到 5G，移动通信网络经历了四代演进，网络规模和复杂度呈指数级增长。传统依赖大量人力的运维模式面临运营成本高、用户体验压力大、业务创新乏力的挑战。 2019 年起，全球领先运营商开始推动自智网络（Autonomous Network, AN）理念——让网络从"人工操作"走向"自动执行"，最终实现"自主治理"，并将网络自治水平分为L1-L5。
@@ -30,9 +48,9 @@ OpenAN 包含 6 个模块，构成了完整的智能体协作框架：
 
 6、通信技能与组件库：负责各种场景下的技能、组件、知识等，运营商、厂商分享贡献。
 
-> **说明**：openAN首次开源发布 A2A-T SDK、注册与编排、场景化实践模块，其他模块后续版本持续演进。
+> **说明**：OpenAN首次开源发布 A2A-T SDK、注册与编排、场景化实践模块，其他模块后续版本持续演进。
 
-![photo](<figures/architectural diagram.png>)
+![photo](figures/architectural%20diagram.png)
 
 
 # 2 软件安装指南
@@ -447,7 +465,7 @@ PYTHON_PATH=
 SERVICE_NAME=registry-center
 
 # 是否自动安装依赖（推荐设置为true，使用pip安装）
-INSTALL_DEPS=true
+INSTALL_DEPS=false
 ```
 
 > 退出vi：按下Esc按键，输入:wq!
@@ -600,7 +618,7 @@ PYTHON_PATH=
 SERVICE_NAME=orchestration-center
 
 # 是否自动安装依赖（推荐设置为true，使用pip安装）
-INSTALL_DEPS=true
+INSTALL_DEPS=false
 ```
 
 > 退出vi：按下Esc按键，输入:wq!
@@ -801,7 +819,7 @@ Java SDK 源码和示例均位于 `a2a-t-java` 仓库。运行前需准备 JDK 1
  	 
 以下视频展示了赛事直播保障场景中多Agent协作的完整流程，涵盖保障执行与保障恢复两个阶段：
 
-![协作流程演示视频](./figures/vedio.gif)
+![协作流程演示视频](./figures/video.gif)
 
 ### 3.1.3 启动示例 Agent
 为了快速体验完整流程，可以启动项目自带的示例 Agent 服务。
@@ -839,7 +857,7 @@ python -m samples.start_agents_server
 | 手动编排 | 将 Agent 卡片拖拽到画布，通过连线定义执行顺序 |
 | 自然语言生成 | 输入业务意图描述，后台自动编排生成 PSOP |
 
-1. 执行工作流
+5. 执行工作流
 - 输入用户意图，单击“检索工作流”按钮
 - 选择匹配的 PSOP
 - 单击 `▶` 按钮执行，右侧区域实时显示执行过程
