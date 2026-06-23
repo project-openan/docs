@@ -1,4 +1,4 @@
-# Release Notes
+﻿# Release Notes
 
 This document is the release notes for OpenAN-v26.06.
 
@@ -109,7 +109,7 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>SQLite Storage</td>
-      <td>Supports using SQLite embedded database for data persistence, enabled through the configuration item persistence_mode=sqlite, suitable for lightweight deployment scenarios.</td>
+      <td>Supports using SQLite embedded database for data persistence (in development), enabled through the configuration item persistence_mode=sqlite, suitable for lightweight deployment scenarios.</td>
     </tr>
     <tr>
       <td rowspan="7">Security Capabilities</td>
@@ -423,7 +423,7 @@ This version is the first release of OpenAN, with modules including registry-cen
     </tr>
     <tr>
       <td>Context Transmission</td>
-      <td>Negotiation context follows A2A-T protocol extension URI convention, carried in Task.metadata through the <code>https://github.com/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1</code> key, supporting serialization and deserialization, ensuring multi-round negotiation state continuity.</td>
+      <td>Negotiation context follows A2A-T protocol extension URI convention, carried in Task.metadata through the <code>https://projects.tmforum.org/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1</code> key, supporting serialization and deserialization, ensuring multi-round negotiation state continuity.</td>
     </tr>
     <tr>
       <td>State Storage</td>
@@ -551,7 +551,7 @@ The initial release of registry-center only provides source code, without binary
 >
 > - The registry-center service is started via `python -m agent_registry.start`, defaulting to listening on `127.0.0.1:5000`.
 > - IP and port can be modified as needed. The configuration file is {installation directory}/etc/conf/server.conf.
-> - Defaults to file storage mode (persistence_mode=file), with data saved in {installation directory}/data/agentcard.json. Supports switching to postgresql or sqlite storage mode. The configuration file is {installation directory}/etc/conf/persistence.conf.
+> - Defaults to file storage mode (persistence_mode=file), with data saved in {installation directory}/data/agentcard.json. Supports switching to postgresql or sqlite (in development) storage mode. The configuration file is {installation directory}/etc/conf/persistence.conf.
 > - Milvus is an optional dependency for the semantic search feature; if semantic search is not used, Milvus does not need to be deployed.
 
 ### Core Dependency Version Compatibility
@@ -651,7 +651,7 @@ The initial release of orchestration-center only provides source code, without b
 
 | Dependency | Version | Purpose |
 |-----|------|------|
-| a2a-t-sdk | >= 0.1.8 | Agent negotiation capability (fulfillment negotiation) |
+| a2a-t-sdk | >= 0.1.9 | Agent negotiation capability (fulfillment negotiation) |
 | a2a-sdk | latest | A2A protocol implementation (http-server + grpc) |
 | fastapi | >= 0.135.1 | REST API framework |
 | uvicorn | >= 0.42 | ASGI server |
@@ -660,7 +660,6 @@ The initial release of orchestration-center only provides source code, without b
 | loguru | >= 0.7.3 | Logging |
 | PyYAML | >= 6.0.3 | YAML parsing |
 | pymupdf | latest | PDF document parsing |
-| sse_starlette | >= 3.3.4 | SSE event stream support |
 
 > **Note:**
 >
@@ -673,7 +672,7 @@ The initial release of orchestration-center only provides source code, without b
 
 The initial release of A2A-T Python SDK only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community A2A-T Python SDK repository](https://github.com/project-openan/a2a-t-sdk).
 
-**Table 1** A2A-T Python SDK v0.1.8 Deliverable List
+**Table 1** A2A-T Python SDK v0.1.9 Deliverable List
 
 <table border="0">
   <thead>
@@ -697,11 +696,11 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 >
 > - The initial release only delivers source code; deliverables do not include build engineering or binary installation packages.
 > - Users need to complete build and installation themselves via `uv sync --dev` or `pip install -e .`.
-> - This version is in the Alpha stage (v0.1.8); interfaces and resource organization may be adjusted with subsequent version evolution.
+> - This version is in the Alpha stage (v0.1.9); interfaces and resource organization may be adjusted with subsequent version evolution.
 
 ### Operating System Version Compatibility
 
-**Table 2** A2A-T Python SDK v0.1.8 Supported Scenarios
+**Table 2** A2A-T Python SDK v0.1.9 Supported Scenarios
 
 | Operating System | Version | Architecture | Applicability |
 |---------|------|------|----------|
@@ -718,7 +717,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Runtime Environment Version Compatibility
 
-**Table 3** A2A-T Python SDK v0.1.8 Runtime Environment Requirements
+**Table 3** A2A-T Python SDK v0.1.9 Runtime Environment Requirements
 
 | Software | Version Requirement | Purpose |
 |-----|---------|------|
@@ -735,7 +734,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Core Dependency Version Compatibility
 
-**Table 4** A2A-T Python SDK v0.1.8 Core Python Dependencies
+**Table 4** A2A-T Python SDK v0.1.9 Core Python Dependencies
 
 | Dependency | Version | Purpose |
 |-----|------|------|
@@ -753,7 +752,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Configuration Item Compatibility
 
-**Table 5** A2A-T Python SDK v0.1.8 Configuration Item Description
+**Table 5** A2A-T Python SDK v0.1.9 Configuration Item Description
 
 | Configuration Category | Configuration Item | Default Value | Description |
 |---------|-------|-------|------|
@@ -785,7 +784,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 ### Protocol Standard Compatibility
 
-**Table 6** Protocol Standards Followed by A2A-T Python SDK v0.1.8
+**Table 6** Protocol Standards Followed by A2A-T Python SDK v0.1.9
 
 | Standard | Version | Description |
 |-----|------|------|
@@ -804,7 +803,7 @@ The initial release of A2A-T Python SDK only provides source code, without binar
 
 The initial release of A2A-T Java SDK only provides source code, without binary installation packages. Source code can be obtained from the [OpenAN community A2A-T Java SDK repository](https://github.com/project-openan/a2a-t-sdk-java).
 
-**Table 1** A2A-T Java SDK v0.1.8 Deliverable List
+**Table 1** A2A-T Java SDK v0.1.9 Deliverable List
 
 <table border="0">
   <thead>
@@ -842,11 +841,11 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 >
 > - The initial release only delivers source code. Integrators need to build artifacts through Maven.
 > - Users can import the SDK through Maven dependencies, or build it themselves via `mvn -DskipTests package`.
-> - This version is in the Alpha stage (v0.1.8); interfaces and module organization may be adjusted with subsequent version evolution.
+> - This version is in the Alpha stage (v0.1.9); interfaces and module organization may be adjusted with subsequent version evolution.
 
 ### Operating System Version Compatibility
 
-**Table 2** A2A-T Java SDK v0.1.8 Supported Scenarios
+**Table 2** A2A-T Java SDK v0.1.9 Supported Scenarios
 
 | Operating System | Version | Architecture | Applicability |
 |---------|------|------|----------|
@@ -863,7 +862,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Runtime Environment Version Compatibility
 
-**Table 3** A2A-T Java SDK v0.1.8 Runtime Environment Requirements
+**Table 3** A2A-T Java SDK v0.1.9 Runtime Environment Requirements
 
 | Software | Version Requirement | Purpose |
 |-----|---------|------|
@@ -881,7 +880,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Core Dependency Version Compatibility
 
-**Table 4** A2A-T Java SDK v0.1.8 Core Dependencies
+**Table 4** A2A-T Java SDK v0.1.9 Core Dependencies
 
 | Dependency | Version | Purpose |
 |-----|------|------|
@@ -902,7 +901,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Module Version Compatibility
 
-**Table 5** A2A-T Java SDK v0.1.8 Module List
+**Table 5** A2A-T Java SDK v0.1.9 Module List
 
 | Module | ArtifactId | Purpose | Dependent Modules |
 |------|-----------|------|----------|
@@ -926,7 +925,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 >           <dependency>
 >               <groupId>net.openan.a2a-t.sdk</groupId>
 >               <artifactId>a2a-t-bom</artifactId>
->               <version>0.1.8</version>
+>               <version>0.1.9</version>
 >               <type>pom</type>
 >               <scope>import</scope>
 >           </dependency>
@@ -937,7 +936,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Configuration Item Compatibility
 
-**Table 6** A2A-T Java SDK v0.1.8 Configuration Item Description
+**Table 6** A2A-T Java SDK v0.1.9 Configuration Item Description
 
 | Configuration Category | Configuration Item | Default Value | Description |
 |---------|-------|-------|------|
@@ -974,7 +973,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 
 ### Protocol Standard Compatibility
 
-**Table 7** Protocol Standards Followed by A2A-T Java SDK v0.1.8
+**Table 7** Protocol Standards Followed by A2A-T Java SDK v0.1.9
 
 | Standard | Version | Description |
 |-----|------|------|
@@ -985,7 +984,7 @@ The initial release of A2A-T Java SDK only provides source code, without binary 
 >
 > - A2A-T Java SDK is the Java reference implementation SDK for the A2A-T protocol standard. Task prompt format and negotiation process follow the above protocol standards.
 > - The A2A-T protocol is the telecom domain extension of the A2A (Agent-to-Agent) protocol, standardized and published by TM Forum.
-> - Negotiation context transmission follows the A2A project telecom extension URI convention, carried in Task.metadata through the `https://github.com/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1` key.
+> - Negotiation context transmission follows the A2A project telecom extension URI convention, carried in Task.metadata through the `https://projects.tmforum.org/a2aproject/telecommunication/extensions/DATA-NEGOTIATION-T/v1` key.
 
 
 # CVE Vulnerabilities

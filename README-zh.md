@@ -1,4 +1,4 @@
-# README
+﻿# README
 
 ## 介绍
 欢迎您访问OpenAN官方文档仓库，参与OpenAN开发者文档开源项目，与我们一起完善开发者文档。
@@ -8,7 +8,7 @@ OpenAN docs仓包含了快速入门（包含项目描述、软件安装指南、
 - 快速入门、安全技术白皮书、RN：https://github.com/project-openan/docs
 - 注册中心用户指南、开发指南、API参考、安全能力指南：https://github.com/project-openan/registry-center/tree/main/docs
 - 编排中心用户指南、开发指南、API参考：https://github.com/project-openan/orchestration-center/tree/main/docs
-- A2A-T Python SDK用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk/tree/main/docs
+- A2A-T Python SDK用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
 - A2A-T Java SDK用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
 
 ## 参与贡献

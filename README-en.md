@@ -1,4 +1,4 @@
-# README
+﻿# README
 
 ## Introduction
 Welcome to the OpenAN official documentation repository. We invite you to participate in the OpenAN developer documentation open-source project and help us improve the developer documentation together.
@@ -8,7 +8,7 @@ The OpenAN docs repository contains quick start (including project description, 
 - Quick Start, Security Technology Whitepaper, RN: https://github.com/project-openan/docs
 - Registry Center User Guide, Developer Guide, API Reference, Security Guide: https://github.com/project-openan/registry-center/tree/main/docs
 - Orchestration Center User Guide, Developer Guide, API Reference: https://github.com/project-openan/orchestration-center/tree/main/docs
-- A2A-T Python SDK User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk/tree/main/docs
+- A2A-T Python SDK User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
 - A2A-T Java SDK User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
 
 ## Contributing

@@ -1,4 +1,4 @@
-# 1 项目介绍
+﻿# 1 项目介绍
 
 ## 背景
 从 2G 到 5G，移动通信网络经历了四代演进，网络规模和复杂度呈指数级增长。传统依赖大量人力的运维模式面临运营成本高、用户体验压力大、业务创新乏力的挑战。 2019 年起，全球领先运营商开始推动自智网络（Autonomous Network, AN）理念——让网络从"人工操作"走向"自动执行"，最终实现"自主治理"，并将网络自治水平分为L1-L5。
@@ -807,7 +807,7 @@ Java SDK 源码和示例均位于 `a2a-t-java` 仓库。运行前需准备 JDK 1
 为了快速体验完整流程，可以启动项目自带的示例 Agent 服务。
 ```bash
 cd {项目路径}/orchestration-center/samples
-python3 start_agents_server.py
+python -m samples.start_agents_server
 ```
 该脚本会：
 - 向注册中心注册多个示例 Agent。

@@ -1,4 +1,4 @@
-# OpenAN Security Technology Whitepaper
+﻿# OpenAN Security Technology Whitepaper
 
 ## Table of Contents
 
@@ -226,8 +226,8 @@ Inbound traffic:
 
 | Service | Port | Protocol | Access Source |
 |------|------|------|---------|
-| registry-center service | As configured (default HTTPS) | HTTPS | Operations client, orchestration-center |
-| orchestration-center backend | As configured (default HTTPS) | HTTPS | Operations client |
+| registry-center service | As configured (default HTTP) | HTTPS | Operations client, orchestration-center |
+| orchestration-center backend | As configured (default HTTP) | HTTPS | Operations client |
 | orchestration-center frontend | 3003 | HTTP | Operations client (intranet) |
 | PostgreSQL | 5432 | TCP | OpenAN service nodes |
 | SSH management | 22 | SSH | System administrator domain |

@@ -1,4 +1,4 @@
-# 1 Project Introduction
+﻿# 1 Project Introduction
 
 ## Background
 
@@ -805,7 +805,7 @@ The following video demonstrates the complete multi-Agent collaboration flow in 
 To quickly experience the complete flow, you can start the example Agent services included in the project.
 ```bash
 cd {project path}/orchestration-center/samples
-python3 start_agents_server.py
+python -m samples.start_agents_server
 ```
 This script will:
 - Register multiple example Agents with the registry-center.
