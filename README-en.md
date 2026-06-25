@@ -26,8 +26,8 @@ The OpenAN docs repository contains quick start (including project description, 
 - Quick Start, Security Technology Whitepaper, RN: https://github.com/project-openan/docs
 - Registry Center User Guide, Developer Guide, API Reference, Security Guide: https://github.com/project-openan/registry-center/tree/main/docs
 - Orchestration Center User Guide, Developer Guide, API Reference: https://github.com/project-openan/orchestration-center/tree/main/docs
-- A2A-T Python SDK User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
-- A2A-T Java SDK User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
+- a2a-t-sdk-python User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
+- a2a-t-sdk-java User Guide, Developer Guide: https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
 
 ## Contributing
 You can review existing documentation, report documentation issues, and contribute your original content. Here are the ways you can contribute:
