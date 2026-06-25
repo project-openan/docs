@@ -26,8 +26,8 @@ OpenAN docs仓包含了快速入门（包含项目描述、软件安装指南、
 - 快速入门、安全技术白皮书、RN：https://github.com/project-openan/docs
 - 注册中心用户指南、开发指南、API参考、安全能力指南：https://github.com/project-openan/registry-center/tree/main/docs
 - 编排中心用户指南、开发指南、API参考：https://github.com/project-openan/orchestration-center/tree/main/docs
-- A2A-T Python SDK用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
-- A2A-T Java SDK用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
+- a2a-t-sdk-python用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
+- a2a-t-sdk-java用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
 
 ## 参与贡献
 您可以对现有文档进行评价、反馈文档问题、贡献您的原创内容。可以参考以下贡献方式：
