@@ -115,7 +115,7 @@ ldd --version
 
 ### Node Requirements
 
-Nodes can connect to external networks.<br>
+For online environments, nodes must be able to connect to external networks. For offline environments, dependency packages must be pre-downloaded on a networked Linux machine with the same architecture as the target server (x86_64 or aarch64), then transferred to the target node for installation (see offline installation steps in [Registry Center Installation Steps](#23-registry-center-installation-steps) and [Orchestration Center Installation Steps](#24-orchestration-center-installation-steps)).<br>
 Nodes can be accessed using the root user.<br>
 The bootstrap node needs the tar tool installed.
 > **Notice**: It is recommended that your node environment is clean, without any Kubernetes components installed, otherwise version conflicts may occur causing installation failure.
@@ -373,19 +373,31 @@ node --version   # Should output v22.19.0
 ```
 1.Download the installation package.
 
-Execute the following command on a Linux server with network access to obtain the installation package. For Windows systems, visit the webpage directly to download
+NodeJS uses pre-compiled binary packages. Select the appropriate package based on the target server architecture. Execute the following command on a Linux server with network access to obtain the installation package. For Windows systems, visit the webpage directly to download.
 
+x86_64 architecture:
 ```bash
 wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz
 ```
 
-Transfer `node-v22.19.0-linux-x64.tar.xz` to the target server.
+aarch64 architecture:
+```bash
+wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-arm64.tar.xz
+```
+
+Transfer the downloaded `.tar.xz` package to the target server.
 
 2.Extract the installation package.
 
+Extract to `/usr/local/` based on the downloaded package name:
 ```bash
+# x86_64 architecture:
 tar -xJf node-v22.19.0-linux-x64.tar.xz -C /usr/local/
 mv /usr/local/node-v22.19.0-linux-x64 /usr/local/nodejs
+
+# aarch64 architecture:
+# tar -xJf node-v22.19.0-linux-arm64.tar.xz -C /usr/local/
+# mv /usr/local/node-v22.19.0-linux-arm64 /usr/local/nodejs
 ```
 
 3.Configure environment variables.
@@ -405,9 +417,10 @@ npm --version
 
 **Notes**
 
-- NodeJS uses pre-compiled binary packages, no compilation toolchain required.
+- NodeJS uses pre-compiled binary packages, no compilation toolchain required. **The architecture must match the target server** (x86_64 corresponds to `linux-x64`, aarch64 corresponds to `linux-arm64`).
 - The default installation path is `/usr/local/nodejs`.
 - For production environments, it is recommended to use nvm to manage multiple NodeJS versions.
+- **Note**: NodeJS is only needed for building the orchestration-center frontend. In production, the frontend is served via nginx as static resources. If only deploying and running on the target server, NodeJS is not required.
 
 ---
 
@@ -415,8 +428,20 @@ npm --version
 ![[photo]](figures/install-registry-center-flow.png)
 1.Get the source code.
 
+**Online environment**:
 ```bash
 git clone https://github.com/project-openan/registry-center.git
+cd registry-center
+```
+
+**Offline environment**: Clone the source code on a networked machine, then package and transfer to the target server.
+```bash
+# Execute on a networked machine
+git clone https://github.com/project-openan/registry-center.git
+tar -czf registry-center.tar.gz registry-center/
+
+# Transfer registry-center.tar.gz to the target server, then extract
+tar -xzf registry-center.tar.gz
 cd registry-center
 ```
 
@@ -438,10 +463,47 @@ After activation, the command line prefix will display `(venv)`.
 
 4.Install dependencies.
 
+**Online environment**: Install dependencies directly after activating the virtual environment.
 ```bash
 # Install all dependencies after activating the virtual environment
 pip install -r ./requirements.txt
 ```
+
+**Offline environment**: The target server cannot connect to external networks. Pre-download wheel packages on a networked Linux machine with the same architecture (x86_64 or aarch64).
+- Execute on the networked machine:
+```bash
+# Create wheel storage directory
+mkdir -p ./wheels
+
+# Check machine architecture
+uname -m   # x86_64 or aarch64
+
+# Download all dependency wheel packages (requires Python 3.12 environment)
+# x86_64 architecture:
+pip download -r ./requirements.txt -d ./wheels \
+  --platform manylinux2014_x86_64 \
+  --python-version 3.12 \
+  --only-binary=:all:
+
+# aarch64 architecture:
+# pip download -r ./requirements.txt -d ./wheels \
+#   --platform manylinux2014_aarch64 \
+#   --python-version 3.12 \
+#   --only-binary=:all:
+
+# Package the wheels directory
+tar -czf registry-center-wheels.tar.gz ./wheels
+```
+- Transfer `requirements.txt` and `registry-center-wheels.tar.gz` to the target server, then execute:
+```bash
+# Extract wheel packages
+tar -xzf registry-center-wheels.tar.gz
+
+# Activate virtual environment and install offline
+source venv/bin/activate
+pip install --no-index --find-links=./wheels -r ./requirements.txt
+```
+> **Note**: `--platform manylinux2014` ensures the downloaded wheel packages are compatible with all systems running glibc 2.17+, covering CentOS 7/Ubuntu 18.04 and above. `--only-binary=:all:` downloads only pre-compiled wheels. If some packages do not have manylinux wheels causing the download to fail, remove this option to download source distributions (sdist) and compile them on the target server (GCC and other build tools required).
 
 5.Service installation configuration (optional).
 
@@ -568,8 +630,20 @@ sudo ./bin/install_service.sh uninstall
 
 1.Get the source code.
 
+**Online environment**:
 ```bash
 git clone https://github.com/project-openan/orchestration-center.git
+cd orchestration-center
+```
+
+**Offline environment**: Clone the source code on a networked machine, then package and transfer to the target server.
+```bash
+# Execute on a networked machine
+git clone https://github.com/project-openan/orchestration-center.git
+tar -czf orchestration-center.tar.gz orchestration-center/
+
+# Transfer orchestration-center.tar.gz to the target server, then extract
+tar -xzf orchestration-center.tar.gz
 cd orchestration-center
 ```
 
@@ -591,10 +665,47 @@ After activation, the command line prefix will display `(venv)`.
 
 4.Install dependencies.
 
+**Online environment**: Install dependencies directly after activating the virtual environment.
 ```bash
 # Install all dependencies after activating the virtual environment
 pip install -r ./requirements.txt
 ```
+
+**Offline environment**: The target server cannot connect to external networks. Pre-download wheel packages on a networked Linux machine with the same architecture (x86_64 or aarch64).
+- Execute on the networked machine:
+```bash
+# Create wheel storage directory
+mkdir -p ./wheels
+
+# Check machine architecture
+uname -m   # x86_64 or aarch64
+
+# Download all dependency wheel packages (requires Python 3.12 environment)
+# x86_64 architecture:
+pip download -r ./requirements.txt -d ./wheels \
+  --platform manylinux2014_x86_64 \
+  --python-version 3.12 \
+  --only-binary=:all:
+
+# aarch64 architecture:
+# pip download -r ./requirements.txt -d ./wheels \
+#   --platform manylinux2014_aarch64 \
+#   --python-version 3.12 \
+#   --only-binary=:all:
+
+# Package the wheels directory
+tar -czf orchestration-center-wheels.tar.gz ./wheels
+```
+- Transfer `requirements.txt` and `orchestration-center-wheels.tar.gz` to the target server, then execute:
+```bash
+# Extract wheel packages
+tar -xzf orchestration-center-wheels.tar.gz
+
+# Activate virtual environment and install offline
+source venv/bin/activate
+pip install --no-index --find-links=./wheels -r ./requirements.txt
+```
+> **Note**: `--platform manylinux2014` ensures the downloaded wheel packages are compatible with all systems running glibc 2.17+, covering CentOS 7/Ubuntu 18.04 and above. `--only-binary=:all:` downloads only pre-compiled wheels. If some packages do not have manylinux wheels causing the download to fail, remove this option to download source distributions (sdist) and compile them on the target server (GCC and other build tools required).
 
 5.Service installation configuration (optional).
 
@@ -706,19 +817,77 @@ sudo ./bin/install_service.sh uninstall
 
 ---
 
-## 2.5 orchestration-center Frontend Offline Installation Steps
+## 2.5 orchestration-center Frontend Deployment Steps
 
-The frontend code has been integrated into the orchestration-center code repository. After completing [Section 2.4](#24-orchestration-center-installation-steps), the frontend code is already installed. You only need to start the frontend service. The startup steps are as follows:
+The frontend code is a React single-page application and has been integrated into the orchestration-center code repository. After completing [Orchestration Center Installation Steps](#24-orchestration-center-installation-steps), the frontend code is already installed.
 
-Enter the `workflow-designer` directory under the orchestration-center installation directory:
-
+**Development mode** (requires NodeJS, for debugging):
 ```bash
 cd {installation directory}/orchestration-center/workflow-designer
 npm install --force
 npm run dev
 ```
+After successful startup, access the frontend at `http://localhost:3003`.
 
-After successful startup, you can access the orchestration-center frontend interface via browser at `http://localhost:3003`.
+**Production mode** (recommended, no NodeJS required on target): Build static resources and serve via nginx.
+- Build on a development machine with NodeJS:
+```bash
+cd orchestration-center/workflow-designer
+npm install --force
+npm run build      # Produces dist/ directory
+tar -czf workflow-designer-dist.tar.gz dist/
+```
+- Transfer `workflow-designer-dist.tar.gz` to the target server, extract to the orchestration-center installation directory, then configure nginx. The following is a complete reference configuration. Modify items marked with `<-- customizable` according to your actual deployment environment:
+
+```nginx
+user nginx                              # <-- Change to actual running user
+worker_processes  1;                    # <-- Adjust based on CPU cores
+events {
+    worker_connections  1024;           # <-- Adjust as needed
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+    # orchestration-center backend cluster; change to actual backend service address
+    upstream orchestrate_backend {
+        server 127.0.0.1:5001 max_fails=3 fail_timeout=30s;  # <-- Replace with actual backend IP:port, can add multiple nodes
+    }
+
+    server {
+        listen       80;                # <-- Change port as needed
+        server_name  localhost;         # <-- Change to actual domain or IP
+
+        # Frontend static resources
+        location / {
+            root   /path/to/orchestration-center/dist;  # <-- Change to actual dist directory path
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;                 # SPA routing support
+        }
+
+        # orchestration-center API reverse proxy
+        location /api/orchestrate/ {
+            proxy_pass http://orchestrate_backend/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_connect_timeout 5s;    # <-- Adjust as needed
+            proxy_send_timeout 180s;     # <-- Adjust as needed
+            proxy_read_timeout 180s;     # <-- Adjust as needed
+            proxy_next_upstream error timeout http_500 http_502 http_503;
+        }
+    }
+}
+```
+
+> **Configuration Notes**: In the above config, `root /path/to/orchestration-center/dist` should be replaced with the actual dist directory path. The `upstream` address `127.0.0.1:5001` should be replaced with the actual orchestration-center backend service address (use `127.0.0.1` for local deployment, or a private IP for remote deployment). Other options (port, timeouts, etc.) can be adjusted according to your network environment and requirements.
+
+> **Note**: Production mode is recommended. The target server does not need NodeJS installed.
 
 ---
 

@@ -116,7 +116,7 @@ ldd --version
 
 ### 节点要求
 
-节点可以连通外部网络。<br>
+在线环境要求节点可以连通外部网络；离线环境需提前在网络已连通的Linux机器（与目标服务器架构一致，x86_64或aarch64）上下载依赖包，再传输到目标节点安装（参见[注册中心服务安装步骤](#23-注册中心服务安装步骤)和[编排中心服务安装步骤](#24-编排中心服务安装步骤)第4步离线安装方案）。<br>
 节点可以使用root用户登录。<br>
 引导节点上需要安装tar工具。
 > **须知**：建议您的节点环境足够干净，未安装任何Kubernetes组件，否则可能会发生版本冲突导致安装失败。
@@ -375,19 +375,31 @@ node --version   # 应输出 v22.19.0
 ```
 1.下载安装包。
 
-在可接通网络的Linux服务器上执行以下命令获取安装包，Windows系统则直接访问网页下载获取
+NodeJS使用预编译二进制包，按目标服务器架构选择对应的包。在可接通网络的Linux服务器上执行以下命令获取安装包，Windows系统则直接访问网页下载获取。
 
+x86_64架构：
 ```bash
 wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz
 ```
 
-将 `node-v22.19.0-linux-x64.tar.xz` 传输到目标服务器。
+aarch64架构：
+```bash
+wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-arm64.tar.xz
+```
+
+将下载的 `.tar.xz` 包传输到目标服务器。
 
 2.解压安装包。
 
+根据下载的包名解压到 `/usr/local/` 目录：
 ```bash
+# x86_64架构：
 tar -xJf node-v22.19.0-linux-x64.tar.xz -C /usr/local/
 mv /usr/local/node-v22.19.0-linux-x64 /usr/local/nodejs
+
+# aarch64架构：
+# tar -xJf node-v22.19.0-linux-arm64.tar.xz -C /usr/local/
+# mv /usr/local/node-v22.19.0-linux-arm64 /usr/local/nodejs
 ```
 
 3.配置环境变量。
@@ -407,9 +419,10 @@ npm --version
 
 **注意事项**
 
-- NodeJS使用预编译二进制包，无需编译工具链。
+- NodeJS使用预编译二进制包，无需编译工具链，**架构必须与目标服务器一致**（x86_64对应 `linux-x64`，aarch64对应 `linux-arm64`）。
 - 默认安装路径为 `/usr/local/nodejs`。
 - 生产环境建议使用nvm管理多个NodeJS版本。
+- **说明**：NodeJS仅用于编排中心前端开发构建，生产环境中前端通过nginx加载静态资源，若仅在目标服务器上部署运行则无需安装NodeJS。
 
 ---
 
@@ -417,8 +430,20 @@ npm --version
 ![[photo]](figures/install-registry-center-flow.png)
 1.获取源码。
 
+**在线环境**：
 ```bash
 git clone https://github.com/project-openan/registry-center.git
+cd registry-center
+```
+
+**离线环境**：在网络已连通的机器上 clone 源码后打包传输到目标服务器。
+```bash
+# 在网络已连通的机器上执行
+git clone https://github.com/project-openan/registry-center.git
+tar -czf registry-center.tar.gz registry-center/
+
+# 将 registry-center.tar.gz 传输到目标服务器后解压
+tar -xzf registry-center.tar.gz
 cd registry-center
 ```
 
@@ -440,10 +465,47 @@ source venv/bin/activate
 
 4.安装依赖。
 
+**在线环境**：激活虚拟环境后直接安装依赖。
 ```bash
 # 激活虚拟环境后安装依赖
 pip install -r ./requirements.txt
 ```
+
+**离线环境**：目标服务器无法连接外部网络，需在相同架构（x86_64或aarch64）的网络已连通的Linux机器上提前下载wheel包。
+- 在网络已连通的机器上执行：
+```bash
+# 创建wheel存放目录
+mkdir -p ./wheels
+
+# 查看机器架构
+uname -m   # x86_64 或 aarch64
+
+# 下载所有依赖的wheel包（需Python 3.12环境）
+# x86_64架构：
+pip download -r ./requirements.txt -d ./wheels \
+  --platform manylinux2014_x86_64 \
+  --python-version 3.12 \
+  --only-binary=:all:
+
+# aarch64架构：
+# pip download -r ./requirements.txt -d ./wheels \
+#   --platform manylinux2014_aarch64 \
+#   --python-version 3.12 \
+#   --only-binary=:all:
+
+# 打包wheel目录
+tar -czf registry-center-wheels.tar.gz ./wheels
+```
+- 将 `requirements.txt` 和 `registry-center-wheels.tar.gz` 传输到目标服务器后执行：
+```bash
+# 解压wheel包
+tar -xzf registry-center-wheels.tar.gz
+
+# 激活虚拟环境后离线安装
+source venv/bin/activate
+pip install --no-index --find-links=./wheels -r ./requirements.txt
+```
+> **说明**：`--platform manylinux2014` 确保下载的wheel包在glibc 2.17+的系统上均可运行，覆盖CentOS 7/Ubuntu 18.04及以上版本。`--only-binary=:all:` 仅下载预编译wheel，若部分包无manylinux wheel导致下载失败，可去掉该参数改为下载源码包（sdist），在目标服务器上编译安装（需GCC等编译工具）。
 
 5.服务安装配置（可选）。
 
@@ -570,8 +632,20 @@ sudo ./bin/install_service.sh uninstall
 
 1.获取源码。
 
+**在线环境**：
 ```bash
 git clone https://github.com/project-openan/orchestration-center.git
+cd orchestration-center
+```
+
+**离线环境**：在网络已连通的机器上 clone 源码后打包传输到目标服务器。
+```bash
+# 在网络已连通的机器上执行
+git clone https://github.com/project-openan/orchestration-center.git
+tar -czf orchestration-center.tar.gz orchestration-center/
+
+# 将 orchestration-center.tar.gz 传输到目标服务器后解压
+tar -xzf orchestration-center.tar.gz
 cd orchestration-center
 ```
 
@@ -593,10 +667,47 @@ source venv/bin/activate
 
 4.安装依赖。
 
+**在线环境**：激活虚拟环境后直接安装依赖。
 ```bash
 # 激活虚拟环境后安装依赖
 pip install -r ./requirements.txt
 ```
+
+**离线环境**：目标服务器无法连接外部网络，需在相同架构（x86_64或aarch64）的网络已连通的Linux机器上提前下载wheel包。
+- 在网络已连通的机器上执行：
+```bash
+# 创建wheel存放目录
+mkdir -p ./wheels
+
+# 查看机器架构
+uname -m   # x86_64 或 aarch64
+
+# 下载所有依赖的wheel包（需Python 3.12环境）
+# x86_64架构：
+pip download -r ./requirements.txt -d ./wheels \
+  --platform manylinux2014_x86_64 \
+  --python-version 3.12 \
+  --only-binary=:all:
+
+# aarch64架构：
+# pip download -r ./requirements.txt -d ./wheels \
+#   --platform manylinux2014_aarch64 \
+#   --python-version 3.12 \
+#   --only-binary=:all:
+
+# 打包wheel目录
+tar -czf orchestration-center-wheels.tar.gz ./wheels
+```
+- 将 `requirements.txt` 和 `orchestration-center-wheels.tar.gz` 传输到目标服务器后执行：
+```bash
+# 解压wheel包
+tar -xzf orchestration-center-wheels.tar.gz
+
+# 激活虚拟环境后离线安装
+source venv/bin/activate
+pip install --no-index --find-links=./wheels -r ./requirements.txt
+```
+> **说明**：`--platform manylinux2014` 确保下载的wheel包在glibc 2.17+的系统上均可运行，覆盖CentOS 7/Ubuntu 18.04及以上版本。`--only-binary=:all:` 仅下载预编译wheel，若部分包无manylinux wheel导致下载失败，可去掉该参数改为下载源码包（sdist），在目标服务器上编译安装（需GCC等编译工具）。
 
 5.服务安装配置（可选）。
 
@@ -708,19 +819,77 @@ sudo ./bin/install_service.sh uninstall
 
 ---
 
-## 2.5 编排中心前端离线安装步骤
+## 2.5 编排中心前端部署步骤
 
-前端代码已集成在编排中心代码仓中，完成[2.4章节](#24-编排中心服务安装步骤)后前端代码即已安装完成，只需启动前端服务即可。启动步骤如下：
+编排中心前端为 React 单页应用，源码已集成在编排中心代码仓中。完成[编排中心服务安装步骤](#24-编排中心服务安装步骤)后前端代码即已安装完成。
 
-进入编排中心安装目录下的 `workflow-designer` 目录：
-
+**开发模式**（需NodeJS，用于调试）：
 ```bash
 cd {安装目录}/orchestration-center/workflow-designer
 npm install --force
 npm run dev
 ```
+启动成功后通过 `http://localhost:3003` 访问。
 
-启动成功后，可通过浏览器访问 `http://localhost:3003` 进入编排中心前端界面。
+**生产模式**（推荐，无需NodeJS）：构建静态资源后通过nginx托管。
+- 在有NodeJS的开发机上构建：
+```bash
+cd orchestration-center/workflow-designer
+npm install --force
+npm run build      # 产出 dist/ 目录
+tar -czf workflow-designer-dist.tar.gz dist/
+```
+- 将 `workflow-designer-dist.tar.gz` 传输到目标服务器，解压到编排中心安装目录后配置 nginx。以下为完整的 nginx 参考配置，用户可根据实际部署环境修改标注了 `<-- 可按需修改` 的配置项：
+
+```nginx
+user nginx                              # <-- 按实际运行用户修改
+worker_processes  1;                    # <-- 可按CPU核数调整
+events {
+    worker_connections  1024;           # <-- 可按需调整
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+    # 编排中心后端集群，按实际后端服务地址修改
+    upstream orchestrate_backend {
+        server 127.0.0.1:5001 max_fails=3 fail_timeout=30s;  # <-- 改为实际后端IP:端口，可添加多个节点
+    }
+
+    server {
+        listen       80;                # <-- 可按需修改监听端口
+        server_name  localhost;         # <-- 按实际域名或IP修改
+
+        # 前端静态资源
+        location / {
+            root   /path/to/orchestration-center/dist;  # <-- 改为实际dist目录路径
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;                 # SPA路由支持
+        }
+
+        # 编排中心 API 反向代理
+        location /api/orchestrate/ {
+            proxy_pass http://orchestrate_backend/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_connect_timeout 5s;    # <-- 可按需调整
+            proxy_send_timeout 180s;     # <-- 可按需调整
+            proxy_read_timeout 180s;     # <-- 可按需调整
+            proxy_next_upstream error timeout http_500 http_502 http_503;
+        }
+    }
+}
+```
+
+> **配置说明**：上述配置中 `root /path/to/orchestration-center/dist` 需替换为实际的 dist 目录路径。`upstream` 中的 `127.0.0.1:5001` 需替换为实际的编排中心后端服务地址（本地部署用 `127.0.0.1`，远程部署用内网IP）。其余选项（端口、超时等）按实际网络环境和需求调整即可。
+
+> **说明**：生产环境推荐构建模式，目标服务器无需安装NodeJS。
 
 ---
 
