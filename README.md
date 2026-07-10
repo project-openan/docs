@@ -1,8 +1,3 @@
-📖 **Select Language / 请选择语言**
-
-- [English Version](./README-en.md)
-- [中文版](./README-zh.md) 
-
 # Introduction
 Welcome to the OpenAN official documentation repository. We invite you to participate in the OpenAN developer documentation open-source project and help us improve the developer documentation together. The OpenAN docs repository contains quick start (including project description, software installation guide, quick start operations), security technology whitepaper, and RN (Release Notes) documents.
 
@@ -18,3 +13,5 @@ You can review existing documentation, report documentation issues, and contribu
 - Create or reply to issues: We welcome you to participate in discussions and contributions by creating or replying to issues.
 - Submit PRs: We welcome you to contribute by submitting pull requests.
 - Submit comments: We welcome you to submit comments on issues or PRs.
+
+如您需要，可查看[中文版README](./README-zh.md) 
