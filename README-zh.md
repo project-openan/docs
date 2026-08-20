@@ -23,9 +23,9 @@ SPDX-License-Identifier: Apache-2.0
 OpenAN docs仓包含了快速入门（包含项目描述、软件安装指南、快速入门操作）、安全技术白皮书、RN（Release Notes）文档。
 
 ## OpenAN文档地址
-- 快速入门、安全技术白皮书、RN：https://github.com/project-openan/docs
-- 注册中心用户指南、开发指南、API参考、安全能力指南：https://github.com/project-openan/registry-center/tree/main/docs
-- 编排中心用户指南、开发指南、API参考：https://github.com/project-openan/orchestration-center/tree/main/docs
+- 快速入门、安全技术白皮书、发行说明：https://github.com/project-openan/docs
+- 注册中心用户指南、开发指南、API参考、GCP容器化部署指南、安全能力指南：https://github.com/project-openan/registry-center/tree/main/docs
+- 编排中心用户指南、开发指南、API参考、GCP容器化部署指南：https://github.com/project-openan/orchestration-center/tree/main/docs
 - a2a-t-sdk-python用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs
 - a2a-t-sdk-java用户指南、开发指南：https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs
 
