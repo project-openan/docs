@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 Copyright (c) 2026 Huawei Technologies Co., Ltd.
 All Rights Reserved.
 
@@ -541,6 +541,19 @@ Modify the registry-center configuration file: `./etc/conf/persistence.conf`
 
 - Modify username `postgresql.username` and password `postgresql.password` according to the actual database settings
 
+Configure the LLM model (required for semantic Agent matching; optional otherwise):
+
+Model definitions live in the registry-center's `./common/config/models.yaml` (the package does not ship that file — copy the `models.yaml.example` next to it). Secrets stay in `.env` or the process environment and are referenced by name through `api_key_env`:
+
+```bash
+cd /OpenA2A-T/registry-center
+cp ./common/config/models.yaml.example ./common/config/models.yaml
+vi ./common/config/models.yaml   # fill in the chat entry; model and url are required
+vi .env                          # set the variable named by api_key_env (never write secrets into the model file)
+```
+
+Without it the service still starts, but semantic matching returns 200 with an empty list, indistinguishable from "no matching Agent". See [registry-center LLM configuration](https://github.com/project-openan/registry-center/blob/main/common/config/README_en.md).
+
 7.Add executable permissions to scripts.
 
 ```bash
@@ -784,6 +797,19 @@ HTTPS capability is under development and disabled by default. To enable it, set
 # Set enable_https=false
 :wq!
 ```
+
+Configure the LLM model (required for intent orchestration, PSOP generation, and semantic retrieval):
+
+Model definitions live in the orchestration-center's `./common/config/models.yaml` (the package does not ship that file — copy the `models.yaml.example` next to it). Secrets stay in `.env` or the process environment and are referenced by name through `api_key_env`:
+
+```bash
+cd /OpenA2A-T/orchestration-center
+cp ./common/config/models.yaml.example ./common/config/models.yaml
+vi ./common/config/models.yaml   # fill in the chat (generation) and embed (semantic retrieval) entries; model and url are required
+vi .env                          # set the variables named by api_key_env (never write secrets into the model file)
+```
+
+Without it the service still starts, but intent orchestration and semantic retrieval return empty results. See [orchestration-center LLM configuration](https://github.com/project-openan/orchestration-center/blob/main/common/config/README_en.md).
 
 10.Start service and status management.
 
