@@ -24,5 +24,7 @@ OpenAN documentation is stored in the [OpenAN/docs](https://github.com/project-o
 | Quick Start, Security Technical White Paper, Release Notes | docs | [Link](https://github.com/project-openan/docs) |
 | Registry Center User Guide, Development Guide, API Reference, GCP Containerized Deployment Guide, Security Capability Guide | registry-center | [Link](https://github.com/project-openan/registry-center/tree/main/docs) |
 | Orchestration Center User Guide, Development Guide, API Reference, GCP Containerized Deployment Guide | orchestration-center | [Link](https://github.com/project-openan/orchestration-center/tree/main/docs) |
-| a2a-t-sdk-python User Guide, Development Guide | a2a-t-sdk-python | [Link](https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs) |
-| a2a-t-sdk-java User Guide, Development Guide | a2a-t-sdk-java | [Link](https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs) |
+| a2a-t-sdk-python Developer Guide, API Reference | a2a-t-sdk-python | [Link](https://github.com/project-openan/a2a-t-sdk-python/tree/main/docs) |
+| a2a-t-sdk-java Developer Guide, API Reference | a2a-t-sdk-java | [Link](https://github.com/project-openan/a2a-t-sdk-java/tree/main/docs) |
+| Workflow Execution Engine SDK (Python) README, Design Document, Developer Guide | workflow-engine-sdk-python | [Link](https://github.com/project-openan/workflow-engine-sdk-python) |
+| Workflow Execution Engine SDK (Java) Integration Guide, API Reference, Business Callbacks, Developer Guide, Design Document | workflow-engine-sdk-java | [Link](https://github.com/project-openan/workflow-engine-sdk-java/tree/main/docs) |

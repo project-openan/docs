@@ -92,6 +92,7 @@ OpenAN adopts a layered security architecture model, building a defense-in-depth
 └────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+The execution engine SDK runs embedded in the host Agent process; its credentials use Bearer authentication with AES-256-GCM encrypted storage, the TLS trust store is configurable, and protocol logs are mandatorily masked. Transport security is jointly guaranteed by the engine's built-in capabilities and the host deployment environment.
 
 ### Security Threat Model
 
@@ -244,13 +245,18 @@ Inbound traffic:
 
 | Service | Port | Protocol | Access Source |
 |------|------|------|---------|
-| registry-center service | As configured (default HTTPS) | HTTPS | Operations client, orchestration-center |
-| orchestration-center backend | As configured (default HTTP, HTTPS under development) | HTTPS | Operations client |
+| registry-center service | 5000 (as configured, HTTPS by default) | HTTPS | Operations client, orchestration-center |
+| registry-center integration access plane | 5001 (disabled by default; same number as the orchestration-center default port — adjust when co-located) | HTTPS | Third-party systems (Bearer/OAuth 2.0/mTLS authentication) |
+| registry-center web console | 3004 (dev port for standalone mode; hosted via Portal plugin or nginx in production) | HTTP/HTTPS | Operations client (intranet) |
+| registry-center internal admin service | Linux: UDS file (run/registry-center/internal.sock); Windows: 127.0.0.1:1108 | UDS/TCP | Local CLI administration |
+| orchestration-center backend | 5001 (configurable; HTTPS supported, disabled in the shipped default configuration) | HTTPS | Operations client |
 | orchestration-center frontend | 3003 | HTTP | Operations client (intranet) |
 | PostgreSQL | 5432 | TCP | OpenAN service nodes |
 | SSH management | 22 | SSH | System administrator domain |
 
 Outbound traffic: 1024~65535
+
+Typical outbound destinations (opened only for features actually enabled): inter-service access and LLM inference nodes (HTTPS), PostgreSQL 5432; Neo4j 7687 (when the knowledge graph API is enabled), webhook callback ports (when change broadcast is enabled, off by default), MySQL 3306 (when MySQL storage or the audit sink is enabled).
 
 
 
@@ -262,7 +268,7 @@ OpenAN service nodes receive requests from different sources, reducing security 
 |---------|---------|---------|---------|---------|
 | **External Network Plane** | External IP | Third-party systems, operations clients | Higher | High-level protection (TLS, authentication) |
 | **Internal Network Plane** | Internal IP | Internal inter-service interactions | Lower | Basic protection |
-| **Management Network Plane** | localhost (UDS) | System administrator backend management | Lowest | Local privilege control |
+| **Management Network Plane** | localhost (Linux: UDS; Windows: TCP 127.0.0.1:1108) | System administrator backend management | Lowest | Local privilege control |
 
 **Protection Measures**:
 
@@ -400,7 +406,9 @@ Application security covers mechanisms such as transmission security, authentica
 
 | Limitation Item | Default Value | Description |
 |--------|--------|------|
-| **Request Size** | 2MB | Prevent large requests from consuming resources |
+| **Request Size** | 1MB | Prevent large requests from consuming resources |
+| **Upload File Size** | 100MB | Solution package (PDF) import limit |
+| **URL Length** | 1024 characters | Prevent overly long URL attacks |
 | **Request Rate** | Configurable | Prevent request flooding attacks |
 | **Connection Timeout** | Configurable | Prevent connection occupation |
 
@@ -447,7 +455,8 @@ registry-center provides AgentCard signing and verification mechanisms:
 |------|------|
 | **Signing Mechanism** | Digitally sign AgentCard upon registration |
 | **Verification Mechanism** | Verify signature upon query, validating data integrity |
-| **Signing Algorithm** | Uses secure signing algorithm (e.g., RSA-SHA256) |
+| **Signing Algorithm** | JWS signature, supporting RS256 / ES256 |
+| **Public Key Verification** | Verification via embedded JWK, or dynamic public key retrieval by jku (restricted by a URL domain whitelist) |
 
 
 
@@ -460,6 +469,7 @@ registry-center provides AgentCard signing and verification mechanisms:
 | **Database Password** | Encrypted storage, configuration file privilege control |
 | **API Token** | Encrypted storage, periodic rotation |
 | **Certificate Private Key** | Privilege control, secure storage |
+| **Model API Key** | Referenced by name from environment variables via api_key_env in models.yaml; never stored in plaintext on disk |
 
 #### Transmission Security
 
