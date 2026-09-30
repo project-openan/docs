@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 Copyright (c) 2026 Huawei Technologies Co., Ltd.
 All Rights Reserved.
 
@@ -49,7 +49,7 @@ OpenAN contains 6 modules, forming a complete intelligent agent collaboration fr
 
 6. Telecommunications Skills and Component Library: Responsible for skills, components, knowledge, etc. under various scenarios, contributed and shared by operators and vendors.
 
-> **Note**: OpenAN's first open-source release includes A2A-T SDK, Registration and Orchestration, and Scenario-based Practices modules. Other modules will continue to evolve in subsequent versions.
+> **Note**: OpenAN's open-source release includes the A2A-T SDK, Registration and Orchestration, Scenario-based Practices, and Execution Engine SDK modules (the Execution Engine SDK includes both Python and Java implementations). The Telecommunications Strategy Evolution and Telecommunications Skills and Component Library modules will continue to evolve in subsequent versions.
 
 ![photo](figures/architectural%20diagram.PNG)
 
@@ -541,6 +541,19 @@ Modify the registry-center configuration file: `./etc/conf/persistence.conf`
 
 - Modify username `postgresql.username` and password `postgresql.password` according to the actual database settings
 
+Configure the LLM model (required for semantic Agent matching; optional otherwise):
+
+Model definitions live in the registry-center's `./etc/config/models.yaml` (the package does not ship that file — copy the `models.yaml.example` next to it). Secrets stay in `.env` or the process environment and are referenced by name through `api_key_env`:
+
+```bash
+cd /OpenA2A-T/registry-center
+cp ./etc/config/models.yaml.example ./etc/config/models.yaml
+vi ./etc/config/models.yaml   # fill in the chat entry; model and url are required
+vi .env                       # set the variable named by api_key_env (never write secrets into the model file)
+```
+
+If no chat model is configured, the service still starts, but the semantic matching endpoint returns 200 with an empty list (an ERROR is logged, so the two cases can be distinguished). Semantic matching uses LLM-based matching by default; set `use_vectordb=true` to switch to the vector database (Milvus) retrieval mode. See [registry-center LLM configuration](https://github.com/project-openan/registry-center/blob/main/etc/config/README_en.md).
+
 7.Add executable permissions to scripts.
 
 ```bash
@@ -580,17 +593,21 @@ cd /OpenA2A-T/registry-center
 The service supports HTTPS and AgentCard signing and signature verification capabilities by default. **For first-time startup, you can choose to disable these, and configure them later as needed by following this section.**
 
 ```bash
-Whether to enable HTTPS enable_https (y/n, default: true): n
-Whether to provide registry-center signing configuration registry.sign.enabled (y/n, default: true): n
-Whether to enable signature verification capability signature_validation_enabled (y/n, default: true): n
+Enter server IP (default: 127.0.0.1):
+Enter server port (default: 5000):
+Enable HTTPS (y/n, default: true): n
+Enable registry signing registry.sign.enabled (y/n, default: true): n
+Enable signature validation (y/n, default: true): n
+Enable agent approval (y/n, default: false): n
 
 ==================================================
-Persistent Storage Configuration
+Persistence Storage Configuration
 ==================================================
 
-Please select storage mode persistence.mode (file/postgresql, default: postgresql): file
+Select storage mode persistence.mode (file/postgresql/sqlite/gauss/mysql, default: file): file
 
-Configuration completed, saved in /OpenA2A-T/registry-center/etc/conf/server.conf
+Configuration complete, saved to /OpenA2A-T/registry-center/etc/conf/server.conf
+You can use 'python -m agent_registry.start' to start the service
 ```
 
 10.Start service and status management.
@@ -734,11 +751,17 @@ INSTALL_DEPS=true
 
 6.Modify database connection configuration.
 
-Modify the orchestration-center configuration file: `./etc/conf/db_config.json`
+The orchestration-center database configuration template is `./etc/conf/db_config.json.template`. Copy it to `db_config.json` first, then modify it:
+
+```bash
+cp ./etc/conf/db_config.json.template ./etc/conf/db_config.json
+```
 
 - Change `host` to the IP of the PostgreSQL database node
 
 - Change `port` to the PostgreSQL database port number, default is `5432`
+
+- Change `database` to the database name, default is `orchestration_center`
 
 - Modify username `user` and password `password` according to the actual database settings
 
@@ -778,12 +801,25 @@ cd /OpenA2A-T/orchestration-center
 vi ./etc/conf/server.conf
 ```
 
-HTTPS capability is under development and disabled by default. To enable it, set `enable_https` to `true`, ensure SSL certificates are configured, then restart the service.
+HTTPS is fully supported (TLS 1.2/1.3, mutual authentication, and certificate revocation list checks) and disabled by default in the bundled configuration (`enable_https=false`). To enable it, set `enable_https` to `true`, ensure SSL certificates are configured in the `etc/ssl` directory, then restart the service.
 
 ```bash
-# Set enable_https=false
+# Enable HTTPS: change enable_https=false to true, then save and exit
 :wq!
 ```
+
+Configure the LLM model (required for intent orchestration, PSOP generation, and semantic retrieval):
+
+Model definitions live in the orchestration-center's `./etc/config/models.yaml` (the package does not ship that file — copy the `models.yaml.example` next to it). Secrets stay in `.env` or the process environment and are referenced by name through `api_key_env`:
+
+```bash
+cd /OpenA2A-T/orchestration-center
+cp ./etc/config/models.yaml.example ./etc/config/models.yaml
+vi ./etc/config/models.yaml   # fill in the chat (generation) and embed (semantic retrieval) entries; model and url are required
+vi .env                       # set the variables named by api_key_env (never write secrets into the model file)
+```
+
+Without it the service still starts, but intent orchestration and semantic retrieval return empty results. See [orchestration-center LLM configuration](https://github.com/project-openan/orchestration-center/blob/main/etc/config/README_en.md).
 
 10.Start service and status management.
 
@@ -876,10 +912,15 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
+            # Required for SSE streaming: HTTP/1.1 with buffering disabled, otherwise execution events cannot reach the frontend in real time
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_buffering off;
+            proxy_cache off;
+
             proxy_connect_timeout 5s;    # <-- Adjust as needed
-            proxy_send_timeout 180s;     # <-- Adjust as needed
-            proxy_read_timeout 180s;     # <-- Adjust as needed
-            proxy_next_upstream error timeout http_500 http_502 http_503;
+            proxy_send_timeout 300s;     # <-- >= 300s recommended for workflow execution/SSE scenarios
+            proxy_read_timeout 300s;     # <-- >= 300s recommended for workflow execution/SSE scenarios
         }
     }
 }
@@ -897,15 +938,45 @@ A2A-T SDK includes a2a-t-sdk-python and a2a-t-sdk-java, which are the Python/Jav
 
 - a2a-t-sdk-python
 
-[Installation and configuration instructions are in the Python SDK User Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/user_guide.md)
+Published to PyPI (`pip install a2a-t-sdk`); [installation and configuration instructions are in the Python SDK Developer Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/developer_guide.md#13-environment-preparation)
 
-The Python SDK source code is in the `a2a-t-sdk` repository, and the end-to-end demonstration samples are in the `a2a-t-samples` repository. Before running, you need to prepare Python 3.12+, and configure an available LLM service address and API Key.
+The Python SDK source code is in the `a2a-t-sdk-python` repository, and the end-to-end demonstration samples are in the in-repo `a2a-t-sample` module. Before running, you need to prepare Python 3.12+, and configure an available LLM service address and API Key (some samples, such as the negotiation demo, automatically install a scripted mock when no LLM API key is configured, so they can run fully offline).
 
 - a2a-t-sdk-java
 
-[Installation and configuration instructions are in the Java SDK User Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/user_guide.md)
+Published to Maven Central (groupId `net.openan.a2a-t.sdk`; versions can be managed uniformly via the BOM); [installation and configuration instructions are in the Java SDK Developer Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/developer_guide.md#13-environment-preparation)
 
-The Java SDK source code and examples are both in the `a2a-t-java` repository. Before running, you need to prepare JDK 17+, Maven, and configure an available LLM service address and API Key.
+The Java SDK source code and examples are both in the `a2a-t-sdk-java` repository (examples are in the in-repo `a2a-t-sample` module). Before running, you need to prepare JDK 17+, Maven, and configure an available LLM service address and API Key.
+
+---
+
+## 2.7 Execution Engine SDK Installation
+
+The Execution Engine SDK is an A2A/A2A-T workflow execution library embedded in the host Agent, with both Python and Java implementations that follow the same business contract: the engine is responsible for workflow DAG scheduling, A2A message encapsulation, task and session association, remote task waiting, the Negotiation-T negotiation loop, and lifecycle management; the host is responsible for interpreting business input, A2A-T content generation and semantic validation (completed via the A2A-T SDK), as well as routing and negotiation decisions. The execution engine itself does not call any LLM and does not provide a standalone service process; it is deployed and runs together with the host Agent.
+
+### 2.7.1 Execution Engine SDK (Python)
+
+Published to PyPI:
+
+```bash
+pip install workflow-exec-engine
+```
+
+Runtime requirements: Python 3.12+, with dependencies on `a2a-sdk>=1.1.2,<2` and `a2a-t-sdk>=1.0.9,<2`. For the source code and a minimal integration example, see the [workflow-engine-sdk-python repository](https://github.com/project-openan/workflow-engine-sdk-python) (root README.md).
+
+### 2.7.2 Execution Engine SDK (Java)
+
+Published to Maven Central (groupId `net.openan.workflow.sdk`, artifacts `workflow-engine` and `spring-boot-starter`). Add the dependency to the host project's pom.xml:
+
+```xml
+<dependency>
+    <groupId>net.openan.workflow.sdk</groupId>
+    <artifactId>workflow-engine</artifactId>
+    <version>0.1.1</version>
+</dependency>
+```
+
+Spring Boot projects can use `spring-boot-starter` instead for auto-configuration. Runtime requirements: JDK 17+ and Maven 3.6+. For integration documentation, see the [workflow-engine-sdk-java repository docs/en](https://github.com/project-openan/workflow-engine-sdk-java/tree/main/docs/en) (integration guide, API reference, business callbacks, developer guide, and design documents).
 
 ---
 
@@ -924,9 +995,9 @@ The registry-center is a service focused on unified Agent management, supporting
 - **Delete Specified AgentCard**: Delete AgentCards that are no longer in use.
 - **Semantic Search for AgentCard**: Search for matching AgentCards based on natural language semantics.
 
-Through these features, the registry-center helps users efficiently integrate, maintain, and discover various Agents, providing foundational capabilities for upper-level orchestration and collaboration.
+Through these features, the registry-center helps users efficiently integrate, maintain, and discover various Agents, providing foundational capabilities for upper-level orchestration and collaboration. In addition, the registry-center provides extended capabilities such as Agent heartbeat health detection, change broadcast (Webhook notifications), an integration access surface for third-party systems (`/integration/v1/*`, disabled by default), a knowledge graph API (based on Neo4j), and a web console (registry-center-web). See the registry-center User Guide for details.
 
-The orchestration-center is a visual orchestration platform for multi-agent collaboration, supporting the definition of invocation relationships and execution flows between Agents through a graphical workflow designer. The backend is based on a Python framework that parses flows and drives Agent collaboration, helping users efficiently build, manage, and run complex Agent collaboration workflows. Key features include:
+The orchestration-center is a visual orchestration platform for multi-agent collaboration, supporting the definition of invocation relationships and execution flows between Agents through a graphical workflow designer. The backend is based on a Python framework that parses flows and dispatches workflows to a host Agent embedded with the Execution Engine SDK, which then drives the scheduled Agents to work together, helping users efficiently build, manage, and run complex Agent collaboration workflows. Key features include:
 
 - **PSOP (Parallel Standard Operating Procedure) Management**: Supports listing, detail querying, saving, and deleting workflows (PSOPs).
 - **PDF Parsing**: Provides PDF file content parsing capabilities, providing data support for subsequent flow design.
@@ -948,43 +1019,33 @@ The orchestration-center is a visual orchestration platform for multi-agent coll
 
 ### 3.1.2 Example Agent Introduction
   	 
-This section uses the live event broadcasting assurance scenario as an example to introduce how multiple Agents collaborate to achieve end-to-end closed-loop autonomy.
+This section uses the cross-city SPN dedicated line fault diagnosis scenario as an example to introduce how multiple Agents collaborate to achieve end-to-end closed-loop autonomy.
   	 
 **Scenario Background**
 
-In the live event broadcasting scenario, network stability during the broadcast must be ensured to guarantee a smooth viewing experience for audiences. This scenario involves the collaboration of three intelligent agents: Live Streaming Agent, Assurance Agent, and RAN Agent.
+In the cross-domain dedicated line operation scenario, when a cross-city SPN dedicated line fails or a complaint is received, the OMCs (network management systems) of two cities need to collaborate to complete dedicated line fault diagnosis and localization. This scenario involves the collaboration of three intelligent agents: Host Agent, SPN Domain Agent City1, and SPN Domain Agent City2.
   	 
 **Agent Role Description**
   	 
 | Agent Name | Responsibility |
 | --- | --- |
-| Live Streaming Agent | Responsible for parsing and monitoring event requirements |
-| Assurance Agent | Responsible for generating assurance strategies and recovery strategies |
-| RAN Agent | Responsible for radio network analysis, planning, and strategy execution |
+| Host Agent | Host agent with the workflow execution engine embedded: receives dispatches from the orchestration-center, loads the PSOP, schedules each node's tasks to the scheduled agents, tracks execution progress, and returns the event stream |
+| SPN Domain Agent City1 | Dedicated line fault diagnosis agent on its own OMC side |
+| SPN Domain Agent City2 | Dedicated line fault diagnosis agent on its own OMC side |
   	 
 **Collaboration Flow**
    
-  The entire live event broadcasting assurance flow consists of two phases: assurance execution and assurance recovery:
 
-- Phase 1: Assurance Execution Flow
 ```mermaid
   	 flowchart LR
-  	     A[Live Streaming Agent<br/>Extract event route and business requirements] --> B[Live Streaming Agent<br/>Send requirements to Assurance Agent]
-  	     B --> C[Assurance Agent<br/>Convert event assurance requirements to network requirements]
-  	     C --> D[Assurance Agent<br/>Send network requirements to RAN Agent]
-  	     D --> E[RAN Agent<br/>Analyze network current status]
-  	     E --> F[RAN Agent<br/>Plan network strategy solution]
-  	     F --> G[RAN Agent<br/>Execute network strategy solution]
-  	     G --> H[Live Streaming Agent<br/>Real-time feedback of KQI metrics and task status]
- ```
-- Phase 2: Assurance Recovery Flow
-```mermaid
-  	 flowchart LR
-  	     H[Live Streaming Agent<br/>Real-time feedback of KQI metrics and task status] --> I[Assurance Agent<br/>Send network configuration recovery instructions]
-  	     I --> J[RAN Agent<br/>Execute network configuration recovery]
+  	     A[Orchestration-center<br/>Retrieves the matching PSOP and dispatches it] --> B[Host Agent<br/>Loads the PSOP; the embedded engine schedules each node]
+  	     B --> C[SPN Domain Agent City1<br/>Local dedicated line fault diagnosis]
+  	     B --> D[SPN Domain Agent City2<br/>Local dedicated line fault diagnosis]
+  	     C --> E[Host Agent<br/>Aggregates diagnosis results and returns them]
+  	     D --> E
  ```
   	 
-The following video demonstrates the complete multi-Agent collaboration flow in the live event broadcasting assurance scenario, covering both the assurance execution and assurance recovery phases:
+The following video demonstrates the complete multi-Agent collaboration flow:
 
 ![Collaboration Flow Demo Video](./figures/video.gif)
 
@@ -995,8 +1056,10 @@ cd {project path}/orchestration-center/samples
 python -m samples.start_agents_server
 ```
 This script will:
-- Register multiple example Agents with the registry-center.
+- Register three example Agents with the registry-center: Host Agent, SPN Domain Agent City1, and SPN Domain Agent City2.
 - Start the corresponding Agent services for the orchestration-center to invoke.
+
+Before running, make sure the registry-center service is started, and that the orchestration-center's registry-center address and LLM model configuration (`etc/config/models.yaml` and `.env`) have been completed as described earlier.
 ### 3.1.4 Core Flow Verification
 After completing the above steps, you can experience OpenAN's core capabilities by following this flow:
 
@@ -1037,15 +1100,14 @@ a2a-t-sdk-python is the Python implementation of the A2A-T protocol, providing t
 
 - **Task Prompt Generation**: The client generates A2A-T processed task prompt based on user natural language or structured input.
 - **Task Prompt Validation**: The server validates the scenario, template, slot, and semantic consistency of the processed task prompt.
-- **Multi-round Negotiation**: Supports four types of negotiation flows: information, clarification, feasibility, and fulfillment.
-- **Prompt Resource Management**: Supports loading local scenario, slot, template, and system prompt resources.
+- **Multi-round Negotiation**: Supports the three negotiation flows — information, feasibility, and target — plus the abort termination mechanism.
+- **Prompt Resource Management**: Supports built-in packaged prompt resources plus a local custom resource directory, with the packaged resources as fallback.
 - **LLM Adaptation**: Connects to external large models via OpenAIClient approach.
 
 Through these capabilities, the Python SDK can help developers quickly build Python Agents that comply with A2A-T interaction specifications, and integrate with A2A protocol links, registry-center, and orchestration-center.
 
 For detailed instructions, see:
 
-- [Python SDK User Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/user_guide.md)
 - [Python SDK Developer Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/developer_guide.md)
 
 ### 3.2.2 a2a-t-sdk-java
@@ -1054,12 +1116,11 @@ a2a-t-sdk-java is the Java implementation of the A2A-T protocol, providing clien
 
 - **Client Prompt Generation**: Generate A2A-T processed task prompt via `A2ATClient`.
 - **Server Prompt Validation**: Validate the scenario, slot, and semantic consistency of the prompt via `A2ATServer`.
-- **Negotiation Flow**: Supports multi-round information supplementation, clarification, feasibility confirmation, and fulfillment confirmation.
-- **Maven Multi-module Project**: Organized by core, resources, llm, prompt, negotiation, client, server, and sample layers.
+- **Negotiation Flow**: Supports multi-round information supplementation, feasibility confirmation, and target negotiation, plus the abort termination mechanism.
+- **Maven Multi-module Project**: Organized by bom, core, resources, llm, prompt, negotiation, client, server, corpus, and sample layers.
 
 Through these capabilities, the Java SDK can help developers reuse A2A-T's task expression, validation, and negotiation capabilities in Java Agents, and discover target Agents through the registry-center.
 
 For detailed instructions, see:
 
-- [Java SDK User Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/user_guide.md)
 - [Java SDK Developer Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/developer_guide.md)
