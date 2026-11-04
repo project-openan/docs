@@ -684,6 +684,10 @@ The initial release of orchestration-center only provides source code, without b
 > - See requirements.txt for the complete dependency list.
 > - The negotiation configuration of a2a-t-sdk is automatically generated from `common/config/llm_config.json` to `samples/a2at_config/.env`.
 
+### Independent Python workflow engine SDK release
+
+Host agents can install `workflow-exec-engine==0.1.1` independently. This version requires Python 3.12 or later, `a2a-t-sdk>=1.2.0,<2` and `a2a-sdk>=1.1.2,<2`. The SDK supports independent management API authentication and token renewal for read-only requests. Before upgrading, check saved PSOP subtask inputs, organization scope for card lookups, and stream timeout settings. For the Orchestration Center service, use the dependency manifest for the specific service release. [PyPI distribution](https://pypi.org/project/workflow-exec-engine/0.1.1/) · [Upgrade notes](https://github.com/project-openan/workflow-engine-sdk-python/releases/tag/v0.1.1)
+
 ## a2a-t-sdk-python
 
 ### Deliverables
