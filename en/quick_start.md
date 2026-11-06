@@ -897,13 +897,13 @@ A2A-T SDK includes a2a-t-sdk-python and a2a-t-sdk-java, which are the Python/Jav
 
 - a2a-t-sdk-python
 
-[Installation and configuration instructions are in the Python SDK User Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/user_guide.md)
+[Installation and configuration instructions are in the a2a-t-sdk-python Developer Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/developer_guide.md)
 
 The Python SDK source code is in the `a2a-t-sdk` repository, and the end-to-end demonstration samples are in the `a2a-t-samples` repository. Before running, you need to prepare Python 3.12+, and configure an available LLM service address and API Key.
 
 - a2a-t-sdk-java
 
-[Installation and configuration instructions are in the Java SDK User Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/user_guide.md)
+[Installation and configuration instructions are in the a2a-t-sdk-java Developer Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/developer_guide.md)
 
 The Java SDK source code and examples are both in the `a2a-t-java` repository. Before running, you need to prepare JDK 17+, Maven, and configure an available LLM service address and API Key.
 
@@ -1045,8 +1045,8 @@ Through these capabilities, the Python SDK can help developers quickly build Pyt
 
 For detailed instructions, see:
 
-- [Python SDK User Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/user_guide.md)
-- [Python SDK Developer Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/developer_guide.md)
+- [a2a-t-sdk-python Developer Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/developer_guide.md)
+
 
 ### 3.2.2 a2a-t-sdk-java
 
@@ -1061,5 +1061,4 @@ Through these capabilities, the Java SDK can help developers reuse A2A-T's task 
 
 For detailed instructions, see:
 
-- [Java SDK User Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/user_guide.md)
 - [Java SDK Developer Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/developer_guide.md)
