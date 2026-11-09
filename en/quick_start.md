@@ -115,7 +115,7 @@ ldd --version
 
 ### Node Requirements
 
-For online environments, nodes must be able to connect to external networks. For offline environments, dependency packages must be pre-downloaded on a networked Linux machine with the same architecture as the target server (x86_64 or aarch64), then transferred to the target node for installation (see offline installation steps in [Registry Center Installation Steps](#23-registry-center-installation-steps) and [Orchestration Center Installation Steps](#24-orchestration-center-installation-steps)).<br>
+For online environments, nodes must be able to connect to external networks. For offline environments, dependency packages must be pre-downloaded on a networked Linux machine with the same architecture as the target server (x86_64 or aarch64), then transferred to the target node for installation (see the [Quick Installation Guide](https://github.com/project-openan/openan-installation/blob/main/docs/en/quick-installation-guide.en.md)).<br>
 Nodes can be accessed using the root user.<br>
 The bootstrap node needs the tar tool installed.
 > **Notice**: It is recommended that your node environment is clean, without any Kubernetes components installed, otherwise version conflicts may occur causing installation failure.
@@ -124,774 +124,126 @@ The bootstrap node needs the tar tool installed.
 
 ---
 
-## 2.2 Dependency Installation
+## 2.2 Quick Installation (Recommended)
 
-This project is developed based on Python 3.12. Before compiling and installing, please ensure the relevant component dependencies meet the following requirements:
+OpenAN provides the unified installation tool [openan-installation](https://github.com/project-openan/openan-installation), which completes installation, verification, and uninstallation with a single command, without manually preparing runtimes and dependencies. It supports two types of environments: binary single-node (VM/bare metal) and containerized Kubernetes clusters. Each installation method follows the unified flow of "Preparation → Configuration Items → Installation → Verification → Uninstallation". For detailed instructions, see the [Quick Installation Guide](https://github.com/project-openan/openan-installation/blob/main/docs/en/quick-installation-guide.en.md).
 
-| Component | Version | Description | Official Download Link |
-| ---------- | ---------- |----------| ---------------------------------------------------------------- |
-| Python | >= 3.12.11 | Project development language | https://www.python.org/ftp/python/3.12.11/Python-3.12.11.tgz     |
-| PostgreSQL | >= 15.6 | Database storage service | https://ftp.postgresql.org/pub/source/v15.6/postgresql-15.6.tar.gz |
-| NodeJS | >= 20.19 | orchestration-center frontend dependency | https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz   |
+### 2.2.1 Binary One-Click Installation (VM/Bare Metal)
 
-> The offline installation guides for each component are as follows. If the system already has the component and the version meets the requirements, you can skip these installation steps. PostgreSQL is used as the database example here; users can choose other databases based on actual scenarios.
+The script automatically detects and installs missing dependencies (Python, Node.js, nginx, etc.), deploys the registry-center, orchestration-center backend and frontend, and automatically configures the unified Nginx entry point.
 
-### 2.2.1 Python Offline Installation Steps
+**Preparation**: A VM or bare-metal server that can access external networks (GitHub / PyPI / Node official sources), with root privileges.
 
-First check whether Python is already installed on the environment and whether the version is 3.12.11. If so, skip the following installation steps.
-```bash
-python3 --version   # Check Python version
-```
+**Configuration Items** (prompted interactively during installation, all with default values; you can press Enter to accept the defaults):
 
+| Configuration Item | Description |
+| ---- | ---- |
+| Component selection | Passed in via the command line: `--reg` installs only the registry-center, `--orc` installs only the orchestration-center; defaults to installing all components. When installing only the orchestration-center, the remote registry-center address must be provided |
+| LLM endpoint | Model name / API URL / API Key (masked input); can be skipped and configured after installation |
+| Sensitive items | Database password, administrator password, etc. Use strong passwords in production environments |
 
-
-1.Download the installation package.
-
-Execute the following command on a Linux server with network access to obtain the installation package. For Windows systems, visit the webpage directly to download.
+**Installation**:
 
 ```bash
-wget https://www.python.org/ftp/python/3.12.11/Python-3.12.11.tgz
+# Obtain the deployment tool
+git clone https://github.com/project-openan/openan-installation.git
+cd openan-installation/binary/one-click
+
+# One-click installation (all components by default; see Configuration Items above)
+bash install.sh
 ```
 
-Transfer `Python-3.12.11.tgz` to the target server.
-
-2.Extract the installation package.
+If the LLM endpoint was skipped during installation, it can be configured or reconfigured afterwards (with connectivity check and masked input):
 
 ```bash
-tar -xzf Python-3.12.11.tgz
-cd Python-3.12.11
+bash configure_llm.sh --reg --orc
 ```
 
-3.Configure the installation path.
+**Verification**:
 
 ```bash
-# Install to /usr/local/python312, avoid overwriting system Python
-./configure --prefix=/usr/local/python312 --enable-optimizations
+# Verify the unified entry API; a non-5xx status code is expected
+curl -sk -o /dev/null -w '%{http_code}\n' \
+  https://127.0.0.1/registry/rest/v1/registry-center/agent-cards
 ```
 
-4.Compile and install.
+Open `https://<server IP>/` in a browser; the orchestration-center frontend page should be displayed.
+
+**Uninstallation**:
 
 ```bash
-make -j 4
-sudo make altinstall
+bash uninstall.sh           # Uninstall after interactive confirmation
+bash uninstall.sh --force   # Skip confirmation (for automation)
 ```
 
-5.Create symbolic links.
+### 2.2.2 Containerized Cluster Installation (Kubernetes)
+
+Deployed via Helm Chart, targeting production clusters.
+
+**Preparation**: A Kubernetes (v1.33+) cluster with external network access, kubectl access, and cluster administrator privileges; Helm can be installed automatically by the wizard if missing.
+
+**Configuration Items** (prompted by the installation wizard, or specified via a `--values` deployment file):
+
+| Configuration Item | Description |
+| ---- | ---- |
+| Release name / namespace | Helm release and deployment namespace, defaults to `openan` / `openan` |
+| Component switches | Select registry / orchestration / frontend as needed |
+| Image and frontend type | Image tag; frontend type can be `portal` or `workflow-designer` |
+| Database | Use in-cluster PostgreSQL, or external MySQL / PostgreSQL (connection information and credentials required) |
+| LLM endpoints | Model name, API URL, and API Key for chat / embed / rerank models; written into models.yaml as a Secret by the wizard |
+| Administrator initial password and access token | Portal administrator initial password (`OC_ADMIN_INITIAL_PASSWORD`) and registry access token |
+| Ingress hostname and TLS (optional) | Configure according to the actual domain and certificates |
+
+**Installation**:
 
 ```bash
-# Create python3 symbolic link
-sudo ln -sf /usr/local/python312/bin/python3 /usr/local/bin/python3
+git clone https://github.com/project-openan/openan-installation.git
+cd openan-installation/containerized/online-install
 
-# Create pip3 symbolic link
-sudo ln -sf /usr/local/python312/bin/pip3 /usr/local/bin/pip3
+# Run the interactive installation wizard (unattended deployment via --values is also supported)
+bash install.sh
 ```
 
-6.Verify installation.
+**Verification**:
 
 ```bash
-python3 --version   # Should output Python 3.12.11
-pip3 --version
+helm status openan -n openan   # STATUS: deployed is expected
+kubectl -n openan get pods     # All pods should be Running / Ready
+curl -s -o /dev/null -w '%{http_code}\n' \
+  http://<ingress-IP>/registry/rest/v1/registry-center/agent-cards   # Non-5xx expected
 ```
 
-**Notes**
-
-- The installation path `/usr/local/python312` does not affect the system's built-in Python.
-- Symbolic links are placed in `/usr/local/bin`, with lower priority than `/usr/bin`.
-- The system's built-in `python` or `python2` commands remain unchanged.
-
-### 2.2.2 Database Offline Installation Steps
-By default, PostgreSQL database is used. Users can choose other databases based on actual scenarios. The following guide uses PostgreSQL as an example:
-
-First check whether PostgreSQL is already installed on the environment and whether the version is 15.6. If so, skip the following installation steps.
-```bash
-psql --version
-```
-
-1.Download the installation package.
-
-Execute the following command on a Linux server with network access to obtain the installation package. For Windows systems, visit the webpage directly to download.
+**Uninstallation**:
 
 ```bash
-wget https://ftp.postgresql.org/pub/source/v15.6/postgresql-15.6.tar.gz
+bash uninstall.sh
 ```
 
-Transfer `postgresql-15.6.tar.gz` to the target server.
-
-2.Extract the installation package.
-
-```bash
-tar -xzf postgresql-15.6.tar.gz
-cd postgresql-15.6
-```
-
-3.Configure the installation path.
-
-```bash
-# Install to /usr/local/pgsql
-./configure --prefix=/usr/local/pgsql --without-readline
-```
-
-Common configuration options:
-- `--prefix=/usr/local/pgsql`: Specify the installation path.
-- `--with-openssl`: Enable SSL support.
-- `--with-readline`: Enable readline support (enabled by default).
-- `--with-zlib`: Enable zlib support (enabled by default).
-
-4.Compile and install.
-
-```bash
-make -j 4
-sudo make install
-```
-
-5.Create postgres user.
-
-```bash
-sudo useradd postgres
-```
-
-6.Create data directory and set permissions.
-
-```bash
-sudo mkdir -p /usr/local/pgsql/data
-sudo chown -R postgres:postgres /usr/local/pgsql/data
-```
-
-7.Initialize the database.
-
-```bash
-su - postgres # Switch to postgres user
-/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
-```
-
-8.Start PostgreSQL service.
-
-```bash
-# Switch to postgres user
-su - postgres
-
-# Start in foreground
-/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l /usr/local/pgsql/data/logfile start
-
-# Add system environment variable
-echo "export PATH=/usr/local/pgsql/bin:\$PATH" >> ~/.bashrc
-source ~/.bashrc
-
-# Confirm successful startup
-psql -l
-
-# Check version
-/usr/local/pgsql/bin/psql --version
-
-# Connect to database
-/usr/local/pgsql/bin/psql -c "SELECT version();"
-```
-
-To exit the `postgres` user, type `exit`.
-
-9.Configure systemd service (optional).
-
-```bash
-sudo tee /etc/systemd/system/postgresql.service << EOF
-[Unit]
-Description=PostgreSQL 15 Database Server
-After=network.target
-
-[Service]
-Type=forking
-User=postgres
-Group=postgres
-Environment=PGDATA=/usr/local/pgsql/data
-ExecStart=/usr/local/pgsql/bin/pg_ctl start -D /usr/local/pgsql/data -l /usr/local/pgsql/data/logfile
-ExecStop=/usr/local/pgsql/bin/pg_ctl stop -D /usr/local/pgsql/data
-ExecReload=/usr/local/pgsql/bin/pg_ctl reload -D /usr/local/pgsql/data
-PIDFile=/usr/local/pgsql/data/postmaster.pid
-TimeoutSec=300
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl enable postgresql
-sudo systemctl start postgresql
-```
-
-10.Create database and user.
-
-```bash
-# Switch to postgres user
-su - postgres
-
-# Enter SQL interactive interface
-psql
-```
-
-Execute in psql:
-
-```sql
-CREATE USER registry_user WITH ENCRYPTED PASSWORD 'your_password' CREATEDB;
-```
-
-11.Configure remote access (using root user).
-
-- Edit `/usr/local/pgsql/data/pg_hba.conf`, add at the end:
-
-```bash
-# Add allowed remote connections
-host    all             all             0.0.0.0/0               scram-sha-256
-```
-
-- Edit `/usr/local/pgsql/data/postgresql.conf`:
-
-```bash
-# Modify listen address
-listen_addresses = '*'
-```
-
-- Restart the service:
-
-```bash
-# Restart using systemctl (recommended)
-sudo systemctl restart postgresql
-
-# Or restart database configuration
-su - postgres -c "/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data restart"
-```
-
-**Notes**
-
-- PostgreSQL uses port 5432 by default.
-- Be sure to change the default password in production environments.
-- Configure firewall rules to restrict database access.
-- It is recommended to back up the database regularly.
-
-### 2.2.3 NodeJS Offline Installation Steps
-First check whether NodeJS is already installed on the environment and whether the version is 22.19.0. If so, skip the following installation steps.
-```bash
-node --version   # Should output v22.19.0
-```
-1.Download the installation package.
-
-NodeJS uses pre-compiled binary packages. Select the appropriate package based on the target server architecture. Execute the following command on a Linux server with network access to obtain the installation package. For Windows systems, visit the webpage directly to download.
-
-x86_64 architecture:
-```bash
-wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-x64.tar.xz
-```
-
-aarch64 architecture:
-```bash
-wget https://nodejs.org/dist/v22.19.0/node-v22.19.0-linux-arm64.tar.xz
-```
-
-Transfer the downloaded `.tar.xz` package to the target server.
-
-2.Extract the installation package.
-
-Extract to `/usr/local/` based on the downloaded package name:
-```bash
-# x86_64 architecture:
-tar -xJf node-v22.19.0-linux-x64.tar.xz -C /usr/local/
-mv /usr/local/node-v22.19.0-linux-x64 /usr/local/nodejs
-
-# aarch64 architecture:
-# tar -xJf node-v22.19.0-linux-arm64.tar.xz -C /usr/local/
-# mv /usr/local/node-v22.19.0-linux-arm64 /usr/local/nodejs
-```
-
-3.Configure environment variables.
-
-```bash
-# Add NodeJS to system environment variables
-echo "export PATH=/usr/local/nodejs/bin:\$PATH" >> ~/.bashrc
-source ~/.bashrc
-```
-
-4.Verify installation.
-
-```bash
-node --version   # Should output v22.19.0
-npm --version
-```
-
-**Notes**
-
-- NodeJS uses pre-compiled binary packages, no compilation toolchain required. **The architecture must match the target server** (x86_64 corresponds to `linux-x64`, aarch64 corresponds to `linux-arm64`).
-- The default installation path is `/usr/local/nodejs`.
-- For production environments, it is recommended to use nvm to manage multiple NodeJS versions.
-- **Note**: NodeJS is only needed for building the orchestration-center frontend. In production, the frontend is served via nginx as static resources. If only deploying and running on the target server, NodeJS is not required.
+> **Note**: The binary one-click installation requires the node to be able to access external networks. For offline single-node, offline cluster, and other scenarios, see the offline installation methods (binary offline installation, containerized offline installation, offline Compose installation) in the [Quick Installation Guide](https://github.com/project-openan/openan-installation/blob/main/docs/en/quick-installation-guide.en.md), or use [Manual Installation](#23-manual-installation).
 
 ---
 
-## 2.3 registry-center Installation Steps
-![[photo]](figures/install-registry-center-flow.png)
-1.Get the source code.
+## 2.3 Manual Installation
 
-**Online environment**:
-```bash
-git clone https://github.com/project-openan/registry-center.git
-cd registry-center
-```
+Applicable to scenarios that require customized systemd service management, connecting to an existing database cluster, or component-by-component source-level deployment. For detailed steps, see the [Manual Installation Guide](https://github.com/project-openan/openan-installation/blob/main/docs/en/manual-installation-guide.en.md), completed in the following order:
 
-**Offline environment**: Clone the source code on a networked machine, then package and transfer to the target server.
-```bash
-# Execute on a networked machine
-git clone https://github.com/project-openan/registry-center.git
-tar -czf registry-center.tar.gz registry-center/
+| Step | Content |
+| ---- | ---- |
+| 1. Dependency installation | Install Python (>= 3.12.11), PostgreSQL (>= 15.6), and NodeJS (>= 20.19, only required for building the orchestration-center frontend) |
+| 2. Registry-center service installation | Obtain the source code, create a virtual environment, install dependencies, configure the database connection, then install as a systemd service and start it |
+| 3. Orchestration-center service installation | Obtain the source code, create a virtual environment, install dependencies, configure the database connection, then install as a systemd service and start it |
+| 4. Orchestration-center frontend deployment | Build the frontend static resources and configure Nginx hosting and the backend reverse proxy |
 
-# Transfer registry-center.tar.gz to the target server, then extract
-tar -xzf registry-center.tar.gz
-cd registry-center
-```
-
-2.Create virtual environment.
+After installation, confirm the service status with the following commands; `active (running)` indicates a successful start:
 
 ```bash
-# Create virtual environment using installed Python 3.12
-python3 -m venv venv --copies
-```
-
-3.Activate virtual environment.
-
-```bash
-# Activate virtual environment
-source venv/bin/activate
-```
-
-After activation, the command line prefix will display `(venv)`.
-
-4.Install dependencies.
-
-**Online environment**: Install dependencies directly after activating the virtual environment.
-```bash
-# Install all dependencies after activating the virtual environment
-pip install -r ./requirements.txt
-```
-
-**Offline environment**: The target server cannot connect to external networks. Pre-download wheel packages on a networked Linux machine with the same architecture (x86_64 or aarch64).
-- Execute on the networked machine:
-```bash
-# Create wheel storage directory
-mkdir -p ./wheels
-
-# Check machine architecture
-uname -m   # x86_64 or aarch64
-
-# Download all dependency wheel packages (requires Python 3.12 environment)
-# x86_64 architecture:
-pip download -r ./requirements.txt -d ./wheels \
-  --platform manylinux2014_x86_64 \
-  --python-version 3.12 \
-  --only-binary=:all:
-
-# aarch64 architecture:
-# pip download -r ./requirements.txt -d ./wheels \
-#   --platform manylinux2014_aarch64 \
-#   --python-version 3.12 \
-#   --only-binary=:all:
-
-# Package the wheels directory
-tar -czf registry-center-wheels.tar.gz ./wheels
-```
-- Transfer `requirements.txt` and `registry-center-wheels.tar.gz` to the target server, then execute:
-```bash
-# Extract wheel packages
-tar -xzf registry-center-wheels.tar.gz
-
-# Activate virtual environment and install offline
-source venv/bin/activate
-pip install --no-index --find-links=./wheels -r ./requirements.txt
-```
-> **Note**: `--platform manylinux2014` ensures the downloaded wheel packages are compatible with all systems running glibc 2.17+, covering CentOS 7/Ubuntu 18.04 and above. `--only-binary=:all:` downloads only pre-compiled wheels. If some packages do not have manylinux wheels causing the download to fail, remove this option to download source distributions (sdist) and compile them on the target server (GCC and other build tools required).
-
-5.Service installation configuration (optional).
-
-You can configure the service deployment directory and other settings in the `./etc/systemd/deploy.conf` file.
-
-```bash
-vi ./etc/systemd/deploy.conf
-
-# Registry Center Deployment Configuration
-# Copyright (c) 2026 Huawei Technologies Co., Ltd.
-
-# Deployment directory (service installation location)
-INSTALL_DIR=/OpenA2A-T/registry-center
-
-# Python path (leave empty to use  INSTALL_DIR/venv/bin/python3)
-PYTHON_PATH=
-
-# Service name
-SERVICE_NAME=registry-center
-
-# Whether to auto-install dependencies (recommended: true, use pip install)
-INSTALL_DEPS=true
-```
-
-> To exit vi: press the Esc key, type :wq!
-
-
-6.Modify database connection configuration.
-
-Modify the registry-center configuration file: `./etc/conf/persistence.conf`
-
-- Change `postgresql.host` to the IP of the database node
-
-- Change `postgresql.port` to the PostgreSQL database port number, default is `5432`
-
-- Modify username `postgresql.username` and password `postgresql.password` according to the actual database settings
-
-7.Add executable permissions to scripts.
-
-```bash
-# Add executable permissions to scripts
-chmod +x ./bin/*.sh
-```
-
-8.Install service to the specified directory.
-
-```bash
-# Install service to the INSTALL_DIR directory specified in step 2.3.5
-sudo ./bin/install_service.sh install
-
-# After successful execution, the following success message will be displayed:
-# Installing the project to /OpenA2A-T/registry-center...
-# Files copied successfully
-# Deploy Configuration:
-#   Install Dir: /OpenA2A-T/registry-center
-#   Python Path: /OpenA2A-T/registry-center/venv/bin/python3
-#   Install Deps: false
-# 
-# Using Python: /OpenA2A-T/registry-center/venv/bin/python3
-# Python 3.12.11
-# Service installed successfully!
-```
-
-9.Initialize service configuration.
-
-```bash
-# Enter the service installation directory
-cd /OpenA2A-T/registry-center
-
-# Initialize service configuration
-./venv/bin/python3 -m agent_registry.init
-```
-
-The service supports HTTPS and AgentCard signing and signature verification capabilities by default. **For first-time startup, you can choose to disable these, and configure them later as needed by following this section.**
-
-```bash
-Whether to enable HTTPS enable_https (y/n, default: true): n
-Whether to provide registry-center signing configuration registry.sign.enabled (y/n, default: true): n
-Whether to enable signature verification capability signature_validation_enabled (y/n, default: true): n
-
-==================================================
-Persistent Storage Configuration
-==================================================
-
-Please select storage mode persistence.mode (file/postgresql, default: postgresql): file
-
-Configuration completed, saved in /OpenA2A-T/registry-center/etc/conf/server.conf
-```
-
-10.Start service and status management.
-
-```bash
-# Start service
-systemctl start registry-center
-
-# View service status
 systemctl status registry-center
-
-# Stop service
-systemctl stop registry-center
-```
-
-11.View service status logs.
-
-```bash
-# View all logs
-journalctl -u registry-center
-
-# Track logs in real time
-journalctl -u registry-center -f
-```
-
-12.Uninstall service.
-
-```bash
-# Uninstall service from installation directory
-sudo ./bin/install_service.sh uninstall
-```
-
----
-
-## 2.4 orchestration-center Installation Steps
-![[photo]](figures/install-orchestration-center-flow.png)
-
-1.Get the source code.
-
-**Online environment**:
-```bash
-git clone https://github.com/project-openan/orchestration-center.git
-cd orchestration-center
-```
-
-**Offline environment**: Clone the source code on a networked machine, then package and transfer to the target server.
-```bash
-# Execute on a networked machine
-git clone https://github.com/project-openan/orchestration-center.git
-tar -czf orchestration-center.tar.gz orchestration-center/
-
-# Transfer orchestration-center.tar.gz to the target server, then extract
-tar -xzf orchestration-center.tar.gz
-cd orchestration-center
-```
-
-2.Create virtual environment.
-
-```bash
-# Create virtual environment using installed Python 3.12
-python3 -m venv venv --copies
-```
-
-3.Activate virtual environment.
-
-```bash
-# Activate virtual environment
-source venv/bin/activate
-```
-
-After activation, the command line prefix will display `(venv)`.
-
-4.Install dependencies.
-
-**Online environment**: Install dependencies directly after activating the virtual environment.
-```bash
-# Install all dependencies after activating the virtual environment
-pip install -r ./requirements.txt
-```
-
-**Offline environment**: The target server cannot connect to external networks. Pre-download wheel packages on a networked Linux machine with the same architecture (x86_64 or aarch64).
-- Execute on the networked machine:
-```bash
-# Create wheel storage directory
-mkdir -p ./wheels
-
-# Check machine architecture
-uname -m   # x86_64 or aarch64
-
-# Download all dependency wheel packages (requires Python 3.12 environment)
-# x86_64 architecture:
-pip download -r ./requirements.txt -d ./wheels \
-  --platform manylinux2014_x86_64 \
-  --python-version 3.12 \
-  --only-binary=:all:
-
-# aarch64 architecture:
-# pip download -r ./requirements.txt -d ./wheels \
-#   --platform manylinux2014_aarch64 \
-#   --python-version 3.12 \
-#   --only-binary=:all:
-
-# Package the wheels directory
-tar -czf orchestration-center-wheels.tar.gz ./wheels
-```
-- Transfer `requirements.txt` and `orchestration-center-wheels.tar.gz` to the target server, then execute:
-```bash
-# Extract wheel packages
-tar -xzf orchestration-center-wheels.tar.gz
-
-# Activate virtual environment and install offline
-source venv/bin/activate
-pip install --no-index --find-links=./wheels -r ./requirements.txt
-```
-> **Note**: `--platform manylinux2014` ensures the downloaded wheel packages are compatible with all systems running glibc 2.17+, covering CentOS 7/Ubuntu 18.04 and above. `--only-binary=:all:` downloads only pre-compiled wheels. If some packages do not have manylinux wheels causing the download to fail, remove this option to download source distributions (sdist) and compile them on the target server (GCC and other build tools required).
-
-5.Service installation configuration (optional).
-
-You can configure the service deployment directory and other settings in the `./etc/systemd/deploy.conf` file.
-
-```bash
-vi ./etc/systemd/deploy.conf
-
-# Orchestration Center Deployment Configuration
-# Copyright (c) 2026 Huawei Technologies Co., Ltd.
-
-# Deployment directory (service installation location)
-INSTALL_DIR=/OpenA2A-T/orchestration-center
-
-# Python path (leave empty to use  INSTALL_DIR/venv/bin/python3)
-PYTHON_PATH=
-
-# Service name
-SERVICE_NAME=orchestration-center
-
-# Whether to auto-install dependencies (recommended: true, use pip install)
-INSTALL_DEPS=true
-```
-
-> To exit vi: press the Esc key, type :wq!
-
-6.Modify database connection configuration.
-
-Modify the orchestration-center configuration file: `./etc/conf/db_config.json`
-
-- Change `host` to the IP of the PostgreSQL database node
-
-- Change `port` to the PostgreSQL database port number, default is `5432`
-
-- Modify username `user` and password `password` according to the actual database settings
-
-7.Add executable permissions to scripts.
-
-```bash
-# Add executable permissions to scripts
-chmod +x ./bin/*.sh
-```
-
-8.Install service to the specified directory.
-
-```bash
-# Install service to the INSTALL_DIR directory specified in step 2.4.5
-sudo ./bin/install_service.sh install
-
-# After successful execution, the following success message will be displayed:
-# Installing the project to /OpenA2A-T/orchestration-center...
-# Files copied successfully
-# Deploy Configuration:
-#   Install Dir: /OpenA2A-T/orchestration-center
-#   Python Path: /OpenA2A-T/orchestration-center/venv/bin/python3
-#   Install Deps: false
-# 
-# Using Python: /OpenA2A-T/orchestration-center/venv/bin/python3
-# Python 3.12.11
-# Service installed successfully!
-```
-
-9.Initialize service configuration (requires database configuration).
-
-```bash
-# Enter the service installation directory
-cd /OpenA2A-T/orchestration-center
-
-# Initialize service configuration, can configure service port, whether to enable HTTPS, etc.
-vi ./etc/conf/server.conf
-```
-
-HTTPS capability is under development and disabled by default. To enable it, set `enable_https` to `true`, ensure SSL certificates are configured, then restart the service.
-
-```bash
-# Set enable_https=false
-:wq!
-```
-
-10.Start service and status management.
-
-```bash
-# Start service
-systemctl start orchestration-center
-
-# View service status
 systemctl status orchestration-center
-
-# Stop service
-systemctl stop orchestration-center
-```
-
-11.View service status logs.
-
-```bash
-# View all logs
-journalctl -u orchestration-center
-
-# Track logs in real time
-journalctl -u orchestration-center -f
-```
-
-12.Uninstall service.
-
-```bash
-# Uninstall service from installation directory
-sudo ./bin/install_service.sh uninstall
 ```
 
 ---
 
-## 2.5 orchestration-center Frontend Deployment Steps
-
-The frontend code is a React single-page application and has been integrated into the orchestration-center code repository. After completing [Orchestration Center Installation Steps](#24-orchestration-center-installation-steps), the frontend code is already installed.
-
-**Development mode** (requires NodeJS, for debugging):
-```bash
-cd {installation directory}/orchestration-center/workflow-designer
-npm install --force
-npm run dev
-```
-After successful startup, access the frontend at `http://localhost:3003`.
-
-**Production mode** (recommended, no NodeJS required on target): Build static resources and serve via nginx.
-- Build on a development machine with NodeJS:
-```bash
-cd orchestration-center/workflow-designer
-npm install --force
-npm run build      # Produces dist/ directory
-tar -czf workflow-designer-dist.tar.gz dist/
-```
-- Transfer `workflow-designer-dist.tar.gz` to the target server, extract to the orchestration-center installation directory, then configure nginx. The following is a complete reference configuration. Modify items marked with `<-- customizable` according to your actual deployment environment:
-
-```nginx
-user nginx                              # <-- Change to actual running user
-worker_processes  1;                    # <-- Adjust based on CPU cores
-events {
-    worker_connections  1024;           # <-- Adjust as needed
-}
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-    sendfile        on;
-    keepalive_timeout  65;
-
-    # orchestration-center backend cluster; change to actual backend service address
-    upstream orchestrate_backend {
-        server 127.0.0.1:5001 max_fails=3 fail_timeout=30s;  # <-- Replace with actual backend IP:port, can add multiple nodes
-    }
-
-    server {
-        listen       80;                # <-- Change port as needed
-        server_name  localhost;         # <-- Change to actual domain or IP
-
-        # Frontend static resources
-        location / {
-            root   /path/to/orchestration-center/dist;  # <-- Change to actual dist directory path
-            index  index.html index.htm;
-            try_files $uri $uri/ /index.html;                 # SPA routing support
-        }
-
-        # orchestration-center API reverse proxy
-        location /api/orchestrate/ {
-            proxy_pass http://orchestrate_backend/;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            proxy_connect_timeout 5s;    # <-- Adjust as needed
-            proxy_send_timeout 180s;     # <-- Adjust as needed
-            proxy_read_timeout 180s;     # <-- Adjust as needed
-            proxy_next_upstream error timeout http_500 http_502 http_503;
-        }
-    }
-}
-```
-
-> **Configuration Notes**: In the above config, `root /path/to/orchestration-center/dist` should be replaced with the actual dist directory path. The `upstream` address `127.0.0.1:5001` should be replaced with the actual orchestration-center backend service address (use `127.0.0.1` for local deployment, or a private IP for remote deployment). Other options (port, timeouts, etc.) can be adjusted according to your network environment and requirements.
-
-> **Note**: Production mode is recommended. The target server does not need NodeJS installed.
-
----
-
-## 2.6 A2A-T SDK Offline Installation Steps
+## 2.4 A2A-T SDK Offline Installation Steps
 
 A2A-T SDK includes a2a-t-sdk-python and a2a-t-sdk-java, which are the Python/Java implementations of the A2A-T protocol. a2a-t-sdk-python provides task prompt generation, prompt validation, and multi-round negotiation capabilities for client Agents and server Agents. a2a-t-sdk-java provides client prompt generation, server prompt validation, negotiation runtime, and A2A Java integration examples for Java Agents.
 
@@ -899,13 +251,13 @@ A2A-T SDK includes a2a-t-sdk-python and a2a-t-sdk-java, which are the Python/Jav
 
 [Installation and configuration instructions are in the a2a-t-sdk-python Developer Guide](https://github.com/project-openan/a2a-t-sdk-python/blob/main/docs/en/developer_guide.md)
 
-The Python SDK source code is in the `a2a-t-sdk` repository, and the end-to-end demonstration samples are in the `a2a-t-samples` repository. Before running, you need to prepare Python 3.12+, and configure an available LLM service address and API Key.
+The Python SDK source code is in the `a2a-t-sdk-python` repository, and the end-to-end demonstration samples are in the `a2a-t-samples` repository. Before running, you need to prepare Python 3.12+, and configure an available LLM service address and API Key.
 
 - a2a-t-sdk-java
 
 [Installation and configuration instructions are in the a2a-t-sdk-java Developer Guide](https://github.com/project-openan/a2a-t-sdk-java/blob/main/docs/en/developer_guide.md)
 
-The Java SDK source code and examples are both in the `a2a-t-java` repository. Before running, you need to prepare JDK 17+, Maven, and configure an available LLM service address and API Key.
+The Java SDK source code and examples are both in the `a2a-t-sdk-java` repository. Before running, you need to prepare JDK 17+, Maven, and configure an available LLM service address and API Key.
 
 ---
 
