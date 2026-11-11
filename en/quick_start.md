@@ -151,9 +151,14 @@ cd openan-installation/binary/one-click
 
 # One-click installation (all components by default; see Configuration Items above)
 bash install.sh
+
+# Example: install only the registry center
+bash install.sh --reg
 ```
 
-If the LLM endpoint was skipped during installation, it can be configured or reconfigured afterwards (with connectivity check and masked input):
+After installation, the script checks that all processes are alive and ports are listening, and outputs the PID and log path of each service; a success message in the output indicates that the deployment is complete. If the installation fails, troubleshoot common causes based on the output (such as port conflicts or dependency download failures) and run the installation command again; if necessary, run `bash uninstall.sh` to clean up the environment and retry. For more failure scenarios and troubleshooting methods, see the [Quick Installation Guide](https://github.com/project-openan/openan-installation/blob/main/docs/en/quick-installation-guide.en.md).
+
+**LLM endpoint configuration (optional)**: If the LLM endpoint was skipped during installation, it can be configured or reconfigured afterwards with the following command (with connectivity check and masked input):
 
 ```bash
 bash configure_llm.sh --reg --orc
@@ -169,6 +174,8 @@ curl -sk -o /dev/null -w '%{http_code}\n' \
 
 Open `https://<server IP>/` in a browser; the orchestration-center frontend page should be displayed.
 
+> **Note**: A non-5xx status code (e.g., `200`) from `curl` and the frontend page opening normally in the browser indicate a successful deployment. `127.0.0.1` in the command is an example address for local deployment; replace it with the actual server IP or domain for remote deployment. If a 5xx code is returned or the page is inaccessible, check the service logs at the log paths output during installation to locate the cause.
+
 **Uninstallation**:
 
 ```bash
@@ -176,7 +183,9 @@ bash uninstall.sh           # Uninstall after interactive confirmation
 bash uninstall.sh --force   # Skip confirmation (for automation)
 ```
 
-### 2.2.2 Containerized Cluster Installation (Kubernetes)
+After uninstallation, the project directory and the Nginx configuration are removed, while runtimes such as Python and Node.js are retained for reinstallation.
+
+### 2.2.2 Containerized One-Click Installation (Kubernetes Cluster)
 
 Deployed via Helm Chart, targeting production clusters.
 
@@ -204,6 +213,8 @@ cd openan-installation/containerized/online-install
 bash install.sh
 ```
 
+The installation takes approximately 10–20 minutes (depending on the network and cluster environment); after it completes, verify the deployment status with the commands below.
+
 **Verification**:
 
 ```bash
@@ -213,11 +224,15 @@ curl -s -o /dev/null -w '%{http_code}\n' \
   http://<ingress-IP>/registry/rest/v1/registry-center/agent-cards   # Non-5xx expected
 ```
 
+> **Note**: `STATUS: deployed` from `helm status`, all pods `Running` and `Ready` from `kubectl get pods`, and a non-5xx status code from the entry API indicate a successful deployment; if any pod is not ready, run `kubectl -n openan describe pod <pod>` to check the events, locate the cause, and re-run the installation command after the issue is fixed.
+
 **Uninstallation**:
 
 ```bash
 bash uninstall.sh
 ```
+
+During uninstallation, choose whether to clean up the data as prompted.
 
 > **Note**: The binary one-click installation requires the node to be able to access external networks. For offline single-node, offline cluster, and other scenarios, see the offline installation methods (binary offline installation, containerized offline installation, offline Compose installation) in the [Quick Installation Guide](https://github.com/project-openan/openan-installation/blob/main/docs/en/quick-installation-guide.en.md), or use [Manual Installation](#23-manual-installation).
 
